@@ -1,0 +1,43 @@
+<div class="ingrediente-container">
+  <button class="btn-back" (click)="goBack()">← Volver al inicio</button>
+
+  <h2>Gestión de Ingredientes</h2>
+
+  <div class="formulario">
+    <input [(ngModel)]="nuevaFila.nombre" placeholder="Nombre" />
+    <input [(ngModel)]="nuevaFila.precio" type="number" placeholder="Precio" />
+    <input [(ngModel)]="nuevaFila.unidad" placeholder="Unidad" />
+    <input [(ngModel)]="nuevaFila.peso" type="number" placeholder="Peso" />
+
+    <select [(ngModel)]="nuevaFila.unidadPeso">
+      <option value="Gramos">Gramos</option>
+      <option value="Kilogramos">Kilogramos</option>
+    </select>
+
+    <button class="btn-agregar" (click)="agregarFila()">Agregar</button>
+  </div>
+
+  <table *ngIf="filas.length > 0">
+    <thead>
+      <tr>
+        <th>Nombre</th>
+        <th>Precio</th>
+        <th>Unidad</th>
+        <th>Peso (Kg)</th>
+        <th>Acciones</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let fila of filas; let i = index">
+        <td>{{ fila.nombre }}</td>
+        <td>${{ fila.precio.toFixed(2) }}</td>
+        <td>{{ fila.unidad }}</td>
+        <td>{{ fila.pesoKg }}</td>
+        <td>
+          <button class="btn-editar" disabled>Editar</button>
+          <button class="btn-eliminar" (click)="eliminarFila(i)">Eliminar</button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>

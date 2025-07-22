@@ -1,0 +1,30 @@
+<div class="login-card">
+  <div class="logo">ITS</div>
+  <h2 class="title">INICIO DE SESIÓN</h2>
+
+  <form (ngSubmit)="login()">
+    <label for="email">CORREO</label>
+    <input
+      [(ngModel)]="form.email"
+      name="email"
+      type="email"
+      placeholder="Ingresa tu correo institucional"
+      required
+    />
+
+    <label for="password">CONTRASEÑA</label>
+    <input
+      [(ngModel)]="form.password"
+      name="password"
+      type="password"
+      placeholder="Ingresa tu contraseña"
+      required
+    />
+
+    <a class="forgot" href="#">OLVIDASTE TU CONTRASEÑA?</a>
+
+    <button type="submit">Iniciar Sesion</button>
+
+    <a class="register" routerLink="/register">REGISTRATE</a>
+  </form>
+</div>

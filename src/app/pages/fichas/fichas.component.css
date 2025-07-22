@@ -1,0 +1,22 @@
+.menu-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1.5rem;
+  padding: 1rem;
+}
+
+.menu-card {
+  display: block;
+  padding: 1.5rem;
+  background-color: #e3f2fd;
+  text-align: center;
+  border-radius: 10px;
+  text-decoration: none;
+  font-weight: bold;
+  color: #0d47a1;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.menu-card:hover {
+  background-color: #bbdefb;
+}

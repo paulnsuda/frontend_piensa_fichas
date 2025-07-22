@@ -1,0 +1,36 @@
+<div class="main-layout">
+  <!-- Sidebar desplegable -->
+  <aside class="sidebar" [class.collapsed]="menuColapsado">
+    <button class="toggle-button" (click)="menuColapsado = !menuColapsado">
+      ☰
+    </button>
+    <nav *ngIf="!menuColapsado">
+      <ul>
+        <li (click)="navigateTo('crear-grupo')">Crear Grupo</li>
+        <li (click)="navigateTo('crear-ingrediente')">Crear Ingrediente</li>
+        <li (click)="navigateTo('crear-proveedor')">Crear Proveedor</li>
+        <li (click)="navigateTo('crear-receta')">Crear Receta</li>
+        <li (click)="navigateTo('crear-ficha')">Crear Ficha</li>
+        <li (click)="navigateTo('consultar-receta')">Consultar Receta</li>
+        <li (click)="navigateTo('consultar-fichas')">Consultar Fichas</li>
+        <li (click)="navigateTo('consultar-ingrediente')">Consultar Ingrediente</li>
+        <li class="logout" (click)="logout()">Cerrar Sesión</li>
+      </ul>
+    </nav>
+  </aside>
+
+  <!-- Contenido principal -->
+  <div class="main-content">
+    <header class="top-bar">
+      <span class="bienvenida">Bienvenido {{ nombreUsuario }}</span>
+      <img src="https://cdn-icons-png.flaticon.com/512/149/149071.png" alt="Perfil" class="profile-img" />
+    </header>
+
+    <section class="contenido-dashboard">
+      <h2>Gestor De Fichas Gastronómicas</h2>
+      <div class="card">Ingredientes (275)</div>
+      <div class="card">Mis Recetas (0)</div>
+      <div class="card">Crear Ficha</div>
+    </section>
+  </div>
+</div>

@@ -1,0 +1,17 @@
+<router-outlet></router-outlet>
+
+<!-- Este menú solo se muestra si NO hay ruta hija activa -->
+<div *ngIf="!hasChildRoute()">
+  <h2>Menú de Fichas Técnicas</h2>
+
+  <div class="menu-grid">
+    <a class="menu-card" routerLink="crear-grupo">Crear Grupo</a>
+    <a class="menu-card" routerLink="crear-ingrediente">Crear Ingrediente</a>
+    <a class="menu-card" routerLink="crear-proveedor">Crear Proveedor</a>
+    <a class="menu-card" routerLink="crear-receta">Crear Receta</a>
+    <a class="menu-card" routerLink="crear-ficha">Crear Ficha</a>
+    <a class="menu-card" routerLink="consultar-receta">Consultar Receta</a>
+    <a class="menu-card" routerLink="consultar-fichas">Consultar Fichas</a>
+    <a class="menu-card" routerLink="consultar-ingrediente">Consultar Ingrediente</a>
+  </div>
+</div>
