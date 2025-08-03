@@ -1,0 +1,44 @@
+<div class="contenedor">
+  <h2>Administrar Recetas</h2>
+
+  <!-- Buscador -->
+  <div class="buscador">
+    <input
+      type="text"
+      [(ngModel)]="busqueda"
+      (input)="filtrar()"
+      placeholder="🔍 Buscar receta por nombre o tipo..."
+    />
+  </div>
+
+  <!-- Tabla -->
+  <table *ngIf="recetasFiltradas.length > 0">
+    <thead>
+      <tr>
+        <th>Nombre</th>
+        <th>Tipo</th>
+        <th>Descripción</th>
+        <th>Tiempo</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let receta of recetasFiltradas">
+        <td>{{ receta.nombre }}</td>
+        <td>{{ receta.tipo }}</td>
+        <td>{{ receta.descripcion }}</td>
+        <td>{{ receta.tiempo }}</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <p *ngIf="recetasFiltradas.length === 0" class="no-resultados">No se encontraron recetas.</p>
+
+  <!-- Formulario -->
+  <div class="formulario">
+    <input type="text" placeholder="Nombre" [(ngModel)]="nuevaReceta.nombre" />
+    <input type="text" placeholder="Tipo" [(ngModel)]="nuevaReceta.tipo" />
+    <input type="text" placeholder="Descripción" [(ngModel)]="nuevaReceta.descripcion" />
+    <input type="text" placeholder="Tiempo estimado" [(ngModel)]="nuevaReceta.tiempo" />
+    <button (click)="agregarReceta()">Agregar</button>
+  </div>
+</div>

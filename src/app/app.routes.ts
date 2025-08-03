@@ -1,9 +1,7 @@
 import { Routes, Router } from '@angular/router';
 import { inject } from '@angular/core';
-import { AuthService } from './guards/auth.service'; // usa el servicio real
-import { roleGuard } from './guards/role.guard'; // si usarás protección por roles
+import { AuthService } from './guards/auth.service';
 
-// Protege por login
 export const authGuard = () => {
   const auth = inject(AuthService);
   const router = inject(Router);
@@ -11,10 +9,11 @@ export const authGuard = () => {
 };
 
 export const routes: Routes = [
+  // Públicas
   {
     path: 'login',
     loadComponent: () => import('./pages/login/login.component').then(m => m.LoginComponent),
-    title: 'Inicio de sesión'
+    title: 'Login'
   },
   {
     path: 'register',
@@ -22,32 +21,57 @@ export const routes: Routes = [
     title: 'Registro'
   },
 
-  // Ruta principal protegida
+  // Protegidas
   {
-    path: 'home',
-    loadComponent: () => import('./pages/home/home.component').then(m => m.HomeComponent),
+    path: '',
+    loadComponent: () => import('./layout/layout.component').then(m => m.LayoutComponent),
     canActivate: [authGuard],
-    title: 'Inicio'
+    children: [
+      {
+        path: 'home',
+        loadComponent: () => import('./pages/home/home.component').then(m => m.HomeComponent),
+        title: 'Inicio'
+      },
+      {
+        path: 'ingredientes',
+        loadComponent: () => import('./pages/ingredientes/ingredientes.component').then(m => m.IngredientesComponent),
+        title: 'Ingredientes'
+      },
+      {
+        path: 'fichas',
+        loadComponent: () => import('./pages/fichas/fichas.component').then(m => m.FichasComponent),
+        title: 'Fichas'
+      },
+      {
+        path: 'recetas',
+        loadComponent: () => import('./pages/recetas/recetas.component').then(m => m.RecetasComponent),
+        title: 'Recetas'
+      },
+      {
+        path: 'compras',
+        loadComponent: () => import('./pages/compras/compras.component').then(m => m.ComprasComponent),
+        title: 'Compras'
+      },
+      {
+        path: 'proveedores',
+        loadComponent: () => import('./pages/proveedores/proveedores.component').then(m => m.ProveedoresComponent),
+        title: 'Proveedores'
+      },
+      {
+        path: 'listar-recetas',
+        loadComponent: () =>
+          import('./pages/listar/listar-recetas.component').then(m => m.ListarRecetasComponent),
+        title: 'Listar Recetas'
+      },
+      {
+        path: 'consultar-receta/:id',
+        loadComponent: () =>
+          import('./pages/recetas/consultar/consultar-receta.component').then(m => m.ConsultarRecetaComponent),
+        title: 'Ficha Técnica'
+      }
+    ]
   },
 
-  // Funcionalidades protegidas
-  { path: 'crear-grupo', loadComponent: () => import('./pages/fichas/crear-grupo/crear-grupo.component').then(m => m.CrearGrupoComponent), canActivate: [authGuard] },
-  { path: 'crear-ingrediente', loadComponent: () => import('./pages/fichas/crear-ingrediente/crear-ingrediente.component').then(m => m.CrearIngredienteComponent), canActivate: [authGuard] },
-  { path: 'crear-proveedor', loadComponent: () => import('./pages/fichas/crear-proveedor/crear-proveedor.component').then(m => m.CrearProveedorComponent), canActivate: [authGuard] },
-  { path: 'crear-receta', loadComponent: () => import('./pages/fichas/crear-receta/crear-receta.component').then(m => m.CrearRecetaComponent), canActivate: [authGuard] },
-  { path: 'crear-ficha', loadComponent: () => import('./pages/fichas/crear-ficha/crear-ficha.component').then(m => m.CrearFichaComponent), canActivate: [authGuard] },
-  { path: 'consultar-receta', loadComponent: () => import('./pages/fichas/consultar-receta/consultar-receta.component').then(m => m.ConsultarRecetaComponent), canActivate: [authGuard] },
-  { path: 'consultar-fichas', loadComponent: () => import('./pages/fichas/consultar-fichas/consultar-fichas.component').then(m => m.ConsultarFichasComponent), canActivate: [authGuard] },
-  { path: 'consultar-ingrediente', loadComponent: () => import('./pages/fichas/consultar-ingrediente/consultar-ingrediente.component').then(m => m.ConsultarIngredienteComponent), canActivate: [authGuard] },
-
-  // Si quieres ruta solo para admin (requiere el roleGuard)
-  // {
-  //   path: 'admin-panel',
-  //   loadComponent: () => import('./pages/admin/admin.component').then(m => m.AdminComponent),
-  //   canActivate: [roleGuard('admin')]
-  // },
-
-  // Redirecciones
-  { path: '', redirectTo: 'login', pathMatch: 'full' },
+  // Redirección
   { path: '**', redirectTo: 'login' }
 ];

@@ -1,0 +1,134 @@
+<div class="bg-white p-8 max-w-4xl mx-auto rounded shadow print:p-0 print:shadow-none print:bg-white">
+
+  <div class="flex justify-between items-center mb-6">
+    <h2 class="text-3xl font-bold">Ficha Técnica: {{ recetaNombre }}</h2>
+    <button
+      (click)="imprimirFicha()"
+      class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 print:hidden"
+    >
+      🖨️ Imprimir
+    </button>
+  </div>
+
+  <table class="table-auto w-full border border-collapse text-sm">
+    <thead class="bg-gray-100">
+      <tr>
+        <th class="border px-4 py-2 text-left">Ingrediente</th>
+        <th class="border px-4 py-2 text-center">Cantidad</th>
+        <th class="border px-4 py-2 text-center">Unidad</th>
+        <th class="border px-4 py-2 text-right">Costo Unitario</th>
+        <th class="border px-4 py-2 text-right">Subtotal</th>
+        <th class="border px-4 py-2 text-center print:hidden">Acciones</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let i of ingredientes">
+        <td class="border px-4 py-1">{{ i.nombre }}</td>
+
+        <td class="border px-4 py-1 text-center">
+          <ng-container *ngIf="editandoId === i.id_receta + '_' + i.id_ingrediente; else soloLecturaCantidad">
+            <input
+              type="number"
+              [(ngModel)]="ingredienteEditado.cantidad"
+              class="input input-sm w-20 text-center"
+            />
+          </ng-container>
+          <ng-template #soloLecturaCantidad>{{ i.cantidad }}</ng-template>
+        </td>
+
+        <td class="border px-4 py-1 text-center">{{ i.unidad }}</td>
+
+        <td class="border px-4 py-1 text-right">
+          <ng-container *ngIf="editandoId === i.id_receta + '_' + i.id_ingrediente; else soloLecturaCosto">
+            <input
+              type="number"
+              [(ngModel)]="ingredienteEditado.costo_unitario"
+              class="input input-sm w-24 text-right"
+            />
+          </ng-container>
+          <ng-template #soloLecturaCosto>{{ i.costo_unitario | currency:'USD' }}</ng-template>
+        </td>
+
+        <td class="border px-4 py-1 text-right">{{ calcularSubtotal(i) | currency:'USD' }}</td>
+
+        <td class="border px-4 py-1 text-center print:hidden">
+          <ng-container *ngIf="editandoId === i.id_receta + '_' + i.id_ingrediente; else botonesNormales">
+            <button
+              class="bg-green-600 text-white text-sm px-2 py-1 rounded mr-1 hover:bg-green-700"
+              (click)="guardarEdicion()"
+            >
+              💾
+            </button>
+            <button
+              class="bg-gray-500 text-white text-sm px-2 py-1 rounded hover:bg-gray-600"
+              (click)="cancelarEdicion()"
+            >
+              ✖️
+            </button>
+          </ng-container>
+          <ng-template #botonesNormales>
+            <button
+              class="bg-yellow-500 text-white text-sm px-2 py-1 rounded mr-1 hover:bg-yellow-600"
+              (click)="empezarEdicion(i)"
+            >
+              ✏️
+            </button>
+            <button
+              class="bg-red-600 text-white text-sm px-2 py-1 rounded hover:bg-red-700"
+              (click)="eliminarIngrediente(i.id_receta, i.id_ingrediente)"
+            >
+              🗑️
+            </button>
+          </ng-template>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="text-right text-lg font-bold mt-4">
+    Costo Total: {{ costoTotal | currency:'USD' }}
+  </div>
+
+  <div class="mt-6 text-sm text-gray-500 print:hidden">
+    Generado el {{ today | date:'dd/MM/yyyy HH:mm' }}
+  </div>
+
+  <!-- Formulario para agregar ingrediente -->
+  <div class="mt-10 border-t pt-6 print:hidden">
+    <h3 class="text-lg font-semibold mb-2">Agregar ingrediente</h3>
+
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
+      <input
+        [(ngModel)]="nuevoIngrediente.nombre"
+        type="text"
+        placeholder="Nombre"
+        class="input input-bordered w-full"
+      />
+      <input
+        [(ngModel)]="nuevoIngrediente.cantidad"
+        type="number"
+        placeholder="Cantidad"
+        class="input input-bordered w-full"
+      />
+      <input
+        [(ngModel)]="nuevoIngrediente.unidad"
+        type="text"
+        placeholder="Unidad"
+        class="input input-bordered w-full"
+      />
+      <input
+        [(ngModel)]="nuevoIngrediente.costo_unitario"
+        type="number"
+        placeholder="Costo Unitario"
+        class="input input-bordered w-full"
+      />
+    </div>
+
+    <button
+      (click)="agregarIngrediente()"
+      class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
+    >
+      ➕ Agregar Ingrediente
+    </button>
+  </div>
+</div>

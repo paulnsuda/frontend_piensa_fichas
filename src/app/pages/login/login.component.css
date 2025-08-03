@@ -1,74 +1,63 @@
 .login-card {
-  width: 400px;
+  max-width: 400px;
   margin: 50px auto;
-  padding: 2rem;
-  border-radius: 15px;
-  background-color: #ffffff;
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+  padding: 30px;
+  border-radius: 10px;
+  background-color: white;
+  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
   text-align: center;
 }
 
 .logo {
-  width: 60px;
-  height: 60px;
-  background-color: #5a90a3;
+  background-color: #5d9ca5;
   color: white;
   font-weight: bold;
   border-radius: 50%;
+  display: inline-block;
+  width: 60px;
+  height: 60px;
   line-height: 60px;
-  font-size: 1.5rem;
-  margin: 0 auto 1rem;
+  font-size: 20px;
+  margin-bottom: 20px;
 }
 
 .title {
-  font-size: 1.4rem;
-  color: #1f2d3d;
-  margin-bottom: 1.5rem;
-}
-
-form {
-  display: flex;
-  flex-direction: column;
-  gap: 0.75rem;
-  text-align: left;
-}
-
-label {
-  font-size: 0.85rem;
-  font-weight: bold;
-  color: #333;
+  font-size: 22px;
+  margin-bottom: 20px;
 }
 
 input {
-  padding: 0.75rem;
+  width: 100%;
+  padding: 10px;
+  margin-top: 5px;
+  margin-bottom: 15px;
   border-radius: 5px;
   border: 1px solid #ccc;
-  font-size: 1rem;
 }
 
 button {
-  padding: 0.8rem;
-  border: none;
-  border-radius: 5px;
-  background-color: #5a90a3;
+  background-color: #5d9ca5;
   color: white;
-  font-size: 1rem;
+  border: none;
+  padding: 10px;
+  width: 100%;
+  border-radius: 5px;
   font-weight: bold;
   cursor: pointer;
-  margin-top: 1rem;
+  margin-top: 10px;
 }
 
-button:hover {
-  background-color: #4b7e91;
-}
-
-.forgot,
-.register {
-  font-size: 0.85rem;
-  color: #1f2d3d;
-  text-align: center;
+a.register {
   display: block;
-  margin-top: 0.5rem;
-  text-decoration: none;
+  margin-top: 15px;
   font-weight: bold;
+  color: #444;
+  text-decoration: none;
+}
+
+a.forgot {
+  font-size: 12px;
+  display: block;
+  margin-bottom: 10px;
+  color: #444;
 }

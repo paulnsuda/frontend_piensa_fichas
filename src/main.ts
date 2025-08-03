@@ -1,18 +1,19 @@
-// main.ts
 import { bootstrapApplication } from '@angular/platform-browser';
+import { AppComponent } from './app/app.component';
 import { provideRouter } from '@angular/router';
 import { routes } from './app/app.routes';
-import { AppComponent } from './app/app.component';
-import { provideHttpClient } from '@angular/common/http';
-import { provideAnimations } from '@angular/platform-browser/animations'; // si usas Angular Material o daisyUI
+import { provideHttpClient, withInterceptors } from '@angular/common/http';
+import { provideAnimations } from '@angular/platform-browser/animations';
 import { importProvidersFrom } from '@angular/core';
-import { BrowserModule } from '@angular/platform-browser'; // SOLUCIÓN CLAVE
+import { FormsModule } from '@angular/forms';
+import { BrowserModule } from '@angular/platform-browser';
+import { authInterceptor } from './app/interceptors/auth.interceptor';
 
 bootstrapApplication(AppComponent, {
   providers: [
     provideRouter(routes),
-    provideHttpClient(),
+    provideHttpClient(withInterceptors([authInterceptor])),
     provideAnimations(),
-    importProvidersFrom(BrowserModule) // 💡 ESTA LÍNEA evita el error del DocumentToken
+    importProvidersFrom(BrowserModule, FormsModule)
   ]
 }).catch(err => console.error(err));

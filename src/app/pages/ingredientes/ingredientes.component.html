@@ -1,1 +1,133 @@
-<p>ingredientes works!</p>
+<h1 class="titulo">Gestionar Ingredientes</h1>
+
+<!-- 🧩 Crear Grupo -->
+<div class="crear-grupo">
+  <h2 class="subtitulo">Crear Grupo</h2>
+  <div class="fila-formulario">
+    <div class="columna">
+      <label>Nombre del Grupo</label>
+      <input [(ngModel)]="nuevoGrupo.nombre" class="input" />
+    </div>
+    <div class="columna">
+      <label>Descripción</label>
+      <input [(ngModel)]="nuevoGrupo.descripcion" class="input" />
+    </div>
+    <div class="columna">
+      <button (click)="agregarGrupo()" class="btn-verde">Agregar Grupo</button>
+    </div>
+  </div>
+</div>
+
+<!-- 🔻 Agregar Ingrediente -->
+<h2 class="subtitulo">Agregar Ingrediente</h2>
+
+<div class="fila-centrada">
+  <input
+    type="text"
+    placeholder="Buscar ingrediente…"
+    [(ngModel)]="busqueda"
+    (ngModelChange)="filtrarIngredientes()"
+    class="input largo"
+  />
+</div>
+
+<div class="fila-formulario">
+  <div class="columna">
+    <label>Nombre</label>
+    <input [(ngModel)]="nueva.nombre_ingrediente" class="input" />
+  </div>
+
+  <div class="columna">
+    <label>Unidad</label>
+    <select [(ngModel)]="nueva.unidad_medida" class="input">
+      <option value="g">g</option>
+      <option value="kg">kg</option>
+      <option value="lb">lb</option>
+    </select>
+  </div>
+
+  <div class="columna">
+    <label>Precio por Kg</label>
+    <input type="number" [(ngModel)]="nueva.precioKg" class="input" />
+  </div>
+
+  <div class="columna">
+    <label>Peso</label>
+    <input type="number" [(ngModel)]="nueva.peso" class="input" />
+  </div>
+
+  <div class="columna">
+    <label>Grupo</label>
+    <input [(ngModel)]="nueva.grupo" class="input" />
+  </div>
+
+  <div class="columna">
+    <button (click)="agregar()" class="btn-verde">Agregar Ingrediente</button>
+  </div>
+</div>
+
+<!-- 📋 Tabla -->
+<table class="tabla">
+  <thead>
+    <tr>
+      <th>Nombre</th>
+      <th>Unidad</th>
+      <th>Precio por Kg</th>
+      <th>Peso</th>
+      <th>Peso (kg)</th>
+      <th>Grupo</th>
+      <th>Acciones</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr *ngFor="let fila of ingredientesFiltrados">
+      <td>
+        <ng-container *ngIf="!fila.editando; else edNombre">{{ fila.nombre_ingrediente }}</ng-container>
+        <ng-template #edNombre>
+          <input [(ngModel)]="fila.nombre_ingrediente" class="input" />
+        </ng-template>
+      </td>
+      <td>
+        <ng-container *ngIf="!fila.editando; else edUni">{{ fila.unidad_medida }}</ng-container>
+        <ng-template #edUni>
+          <select [(ngModel)]="fila.unidad_medida" class="input">
+            <option value="g">g</option>
+            <option value="kg">kg</option>
+            <option value="lb">lb</option>
+          </select>
+        </ng-template>
+      </td>
+      <td>
+        <ng-container *ngIf="!fila.editando; else edPrecioKg">
+          {{ fila.precioKg | number : '1.2-2' }}
+        </ng-container>
+        <ng-template #edPrecioKg>
+          <input type="number" [(ngModel)]="fila.precioKg" class="input" />
+        </ng-template>
+      </td>
+      <td>
+        <ng-container *ngIf="!fila.editando; else edPes">{{ fila.peso | number: '1.2-2' }}</ng-container>
+        <ng-template #edPes>
+          <input type="number" [(ngModel)]="fila.peso" class="input" />
+        </ng-template>
+      </td>
+      <td>{{ fila.pesoKg | number: '1.2-2' }}</td>
+      <td>
+        <ng-container *ngIf="!fila.editando; else edGru">{{ fila.grupo }}</ng-container>
+        <ng-template #edGru>
+          <input [(ngModel)]="fila.grupo" class="input" />
+        </ng-template>
+      </td>
+      <td>
+        <ng-container *ngIf="!fila.editando">
+          <button (click)="editar(fila)">✏️</button>
+          <button (click)="eliminar(fila)">🗑️</button>
+        </ng-container>
+        <ng-container *ngIf="fila.editando">
+          <button (click)="guardar(fila)">💾</button>
+          <button (click)="cancelar(fila)">↩️</button>
+        </ng-container>
+      </td>
+    </tr>
+  </tbody>
+</table>

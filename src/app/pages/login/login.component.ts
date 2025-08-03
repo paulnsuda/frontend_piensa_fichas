@@ -1,43 +1,34 @@
 import { Component } from '@angular/core';
-import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { AuthService } from '../../guards/auth.service';
-import { RouterModule } from '@angular/router'; // 👈 AGREGA ESTA LÍNEA
+import { FormsModule } from '@angular/forms';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [FormsModule, RouterModule], // 👈 AGREGA RouterModule AQUÍ TAMBIÉN
+  imports: [FormsModule, CommonModule],
   templateUrl: './login.component.html',
-  styleUrls: ['./login.component.css'],
+  styleUrls: ['./login.component.css']
 })
 export class LoginComponent {
-  form: { email: string; password: string } = {
-    email: 'paul@example.com',
-    password: 'password123'
+  form = {
+    email: '',
+    password: ''
   };
 
-  constructor(
-    private authService: AuthService,
-    private router: Router
-  ) {}
+  constructor(private authService: AuthService, private router: Router) {}
 
-  login(): void {
-    if (!this.form.email || !this.form.password) {
-      alert('Por favor, completa todos los campos.');
-      return;
-    }
-
+  login() {
     this.authService.login(this.form).subscribe({
-      next: res => {
+      next: (res) => {
+        // CAMBIO AQUÍ: el token viene como 'access_token'
         this.authService.setToken(res.access_token);
         this.router.navigate(['/home']);
       },
-      error: err => {
-        const message = err.error?.message || 'Credenciales incorrectas';
-        alert('Error al iniciar sesión: ' + message);
+      error: (err) => {
+        alert('Error al iniciar sesión: ' + err.error.message);
       }
     });
   }
 }
-

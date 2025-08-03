@@ -1,0 +1,27 @@
+<div class="max-w-4xl mx-auto p-6 bg-white rounded shadow">
+  <h2 class="text-2xl font-bold mb-4 text-center">Lista de Recetas</h2>
+
+  <table class="table-auto w-full border border-collapse text-sm">
+    <thead class="bg-gray-100">
+      <tr>
+        <th class="border px-4 py-2 text-left">Nombre</th>
+        <th class="border px-4 py-2 text-right">Costo Total</th>
+        <th class="border px-4 py-2 text-center">Acciones</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let r of recetas">
+        <td class="border px-4 py-2">{{ r.nombre }}</td>
+        <td class="border px-4 py-2 text-right">{{ r.costo_total | currency:'USD' }}</td>
+        <td class="border px-4 py-2 text-center">
+          <button
+            (click)="verFicha(r.id)"
+            class="bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700 text-sm"
+          >
+            Ver Ficha
+          </button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>

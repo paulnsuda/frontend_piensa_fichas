@@ -1,19 +1,53 @@
-import { Component, computed, inject } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterOutlet, ActivatedRoute } from '@angular/router';
+import { FormsModule } from '@angular/forms';
+
+interface Ficha {
+  nombre: string;
+  grupo: string;
+  descripcion: string;
+  costoTotal: number;
+}
 
 @Component({
   selector: 'app-fichas',
   standalone: true,
-  imports: [CommonModule, RouterOutlet],
+  imports: [CommonModule, FormsModule],
   templateUrl: './fichas.component.html',
   styleUrls: ['./fichas.component.css']
 })
-export class FichasComponent {
-  private route = inject(ActivatedRoute);
+export class FichasComponent implements OnInit {
+  fichas: Ficha[] = [];
+  fichasFiltradas: Ficha[] = [];
+  busqueda: string = '';
 
-  // Computed property para saber si hay una ruta hija activa
-  hasChildRoute = computed(() => {
-    return this.route.firstChild?.snapshot.routeConfig?.path !== undefined;
-  });
+  nuevaFicha: Ficha = {
+    nombre: '',
+    grupo: '',
+    descripcion: '',
+    costoTotal: 0
+  };
+
+  ngOnInit(): void {
+    // En un futuro esto puede venir del backend
+    this.fichasFiltradas = [...this.fichas];
+  }
+
+  agregarFicha() {
+    if (!this.nuevaFicha.nombre || !this.nuevaFicha.grupo || !this.nuevaFicha.costoTotal) {
+      alert('Por favor completa todos los campos obligatorios.');
+      return;
+    }
+
+    this.fichas.push({ ...this.nuevaFicha });
+    this.filtrar();
+    this.nuevaFicha = { nombre: '', grupo: '', descripcion: '', costoTotal: 0 };
+  }
+
+  filtrar() {
+    const texto = this.busqueda.trim().toLowerCase();
+    this.fichasFiltradas = this.fichas.filter(f =>
+      f.nombre.toLowerCase().includes(texto) || f.grupo.toLowerCase().includes(texto)
+    );
+  }
 }

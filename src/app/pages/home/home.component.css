@@ -1,131 +1,30 @@
-/* Fondo con imagen gastronómica */
-body {
-  margin: 0;
-  background: url('/assets/fondo-gastronomia.jpg') no-repeat center center fixed;
-  background-size: cover;
-}
-
-/* Capa blanca translúcida sobre el fondo */
-.main-layout {
-  display: flex;
-  height: 100vh;
-  font-family: 'Segoe UI', sans-serif;
-  background-color: rgba(255, 255, 255, 0.9);
-}
-
-/* Sidebar desplegable */
-.sidebar {
-  width: 240px;
-  background-color: #e0f2ff;
-  padding: 1rem;
-  transition: width 0.3s ease;
-  position: relative;
-  box-shadow: 2px 0 6px rgba(0, 0, 0, 0.1);
-}
-
-.sidebar.collapsed {
-  width: 60px;
-}
-
-.toggle-button {
-  background: none;
-  border: none;
-  font-size: 1.5rem;
-  cursor: pointer;
-  color: #333;
-  margin-bottom: 1rem;
-}
-
-.sidebar ul {
-  list-style: none;
-  padding-left: 0;
-}
-
-.sidebar li {
-  padding: 0.6rem 0.5rem;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  transition: background 0.2s;
-  font-size: 15px;
-}
-
-.sidebar li i {
-  font-size: 16px;
-  width: 20px;
+.home-page {
+  padding: 2rem;
   text-align: center;
 }
 
-.sidebar li:hover {
-  background-color: #c1e0f9;
-  border-radius: 6px;
-}
-
-.sidebar .logout {
-  color: red;
-  font-weight: bold;
-  margin-top: 1rem;
-}
-
-/* Contenido principal */
-.main-content {
-  flex-grow: 1;
+.grid-opciones {
   display: flex;
-  flex-direction: column;
-  background-color: rgba(255, 255, 255, 0.8);
+  justify-content: center;
+  gap: 2rem;
+  margin-top: 2rem;
 }
 
-/* Barra superior */
-.top-bar {
-  background-color: #2196f3;
-  color: white;
-  padding: 1rem;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.top-bar .profile-img {
-  width: 34px;
-  height: 34px;
-  border-radius: 50%;
-  object-fit: cover;
-  background-color: white;
-}
-
-/* Contenido del dashboard */
-.contenido-dashboard {
-  padding: 2rem;
-}
-
-.contenido-dashboard h2 {
-  font-size: 1.8rem;
-  margin-bottom: 1.5rem;
-  color: #2c3e50;
-}
-
-/* Tarjetas visuales */
-.card {
-  background-color: white;
-  padding: 1.5rem;
-  margin-bottom: 1rem;
-  border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+.card-opcion {
+  padding: 1.5rem 2rem;
+  background-color: #f3f4f6;
+  border-radius: 1rem;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
   transition: transform 0.2s ease;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  font-size: 1.1rem;
-  font-weight: 500;
 }
 
-.card:hover {
-  transform: translateY(-4px);
-  background-color: #f4faff;
+.card-opcion:hover {
+  transform: scale(1.05);
 }
 
-.card::before {
-  content: '🍽️';
-  font-size: 1.5rem;
+.card-opcion a {
+  text-decoration: none;
+  font-size: 1.2rem;
+  font-weight: bold;
+  color: #333;
 }

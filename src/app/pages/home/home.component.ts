@@ -1,27 +1,28 @@
-import { Component } from '@angular/core';
-import { Router } from '@angular/router';
+import { Component, OnInit } from '@angular/core';
+import { RouterModule } from '@angular/router';
+import { CommonModule } from '@angular/common';
 import { AuthService } from '../../guards/auth.service';
-import { CommonModule } from '@angular/common'; // ✅ Necesario para *ngIf
+import { Router } from '@angular/router';
+
 
 @Component({
   selector: 'app-home',
-  templateUrl: './home.component.html',
-  styleUrls: ['./home.component.css'],
   standalone: true,
-  imports: [CommonModule] // ✅ Añadir CommonModule aquí
+  imports: [CommonModule, RouterModule], // 👈 IMPORTANTE
+  templateUrl: './home.component.html',
+  styleUrls: ['./home.component.css']
 })
-export class HomeComponent {
-  nombreUsuario = 'Paul';
-  menuColapsado = false;
+export class HomeComponent implements OnInit {
+  rol: string | null = null;
 
-  constructor(private router: Router, private authService: AuthService) {}
+  constructor(private auth: AuthService, private router: Router) {}
 
-  navigateTo(path: string) {
-    this.router.navigate([`/${path}`]);
+  ngOnInit(): void {
+    this.rol = this.auth.getUserRole();
   }
 
-  logout() {
-    this.authService.logout();
-    this.router.navigate(['/']);
+  logout(): void {
+    this.auth.logout();
+    this.router.navigate(['/login']);
   }
 }
