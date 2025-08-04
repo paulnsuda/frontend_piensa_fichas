@@ -16,13 +16,14 @@ export class ListarRecetasComponent implements OnInit {
   constructor(private recetaService: RecetaService, private router: Router) {}
 
   ngOnInit(): void {
-    this.recetaService.getRecetas().subscribe({
-      next: (data) => (this.recetas = data),
+    this.recetaService.findAll().subscribe({
+      next: (data: any[]) => (this.recetas = data),
       error: () => alert('Error al cargar recetas'),
     });
   }
 
   verFicha(id: number) {
-    this.router.navigate(['/consultar-receta', id]);
+    // Redirige al nuevo componente "recetas"
+    this.router.navigate(['/recetas', id]);
   }
 }

@@ -1,13 +1,19 @@
+<!-- layout.component.html -->
 <nav class="navbar">
   <div class="logo">🍽️ Gestor Gastronómico</div>
 
   <div class="nav-links">
-    <a routerLink="/home" routerLinkActive="active">Inicio</a>
+    <a routerLink="/home"        routerLinkActive="active">Inicio</a>
     <a routerLink="/ingredientes" routerLinkActive="active">Ingredientes</a>
-    <a routerLink="/fichas" routerLinkActive="active">Fichas</a>
-    <a routerLink="/recetas" routerLinkActive="active">Recetas</a>
-    <a routerLink="/compras" routerLinkActive="active">Compras</a>
+
+    <!-- ⇢ listado de recetas (no pide :id) -->
+    <!-- siempre abre la ficha de la receta 1 -->
+<a [routerLink]="['/recetas', 1]" routerLinkActive="active">Fichas</a>
+
+
+    <a routerLink="/compras"     routerLinkActive="active">Compras</a>
     <a routerLink="/proveedores" routerLinkActive="active">Proveedores</a>
+
     <span class="rol" *ngIf="rol">Rol: {{ rol }}</span>
     <button (click)="logout()">Cerrar sesión</button>
   </div>

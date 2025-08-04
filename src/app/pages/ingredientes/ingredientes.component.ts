@@ -23,7 +23,7 @@ export class IngredientesComponent implements OnInit {
   nueva: Partial<Ingrediente> = {
     nombre_ingrediente: '',
     unidad_medida: 'g',
-    precioKg: 0, // ✅ corregido: era `precio`
+    precioKg: 0,
     peso: 0,
     grupo: '',
   };
@@ -41,7 +41,7 @@ export class IngredientesComponent implements OnInit {
 
   // 👉 Cargar ingredientes desde el backend
   cargar() {
-    this.srv.getIngredientes().subscribe((data) => {
+    this.srv.findAll().subscribe((data: Ingrediente[]) => {
       this.ingredientes = data;
       this.filtrarIngredientes();
     });
@@ -49,8 +49,8 @@ export class IngredientesComponent implements OnInit {
 
   // 👉 Agregar nuevo ingrediente
   agregar() {
-    this.srv.createIngrediente(this.nueva).subscribe({
-      next: (ing) => {
+    this.srv.create(this.nueva).subscribe({
+      next: (ing: Ingrediente) => {
         this.ingredientes.push(ing);
         this.filtrarIngredientes();
         this.nueva = {
@@ -73,11 +73,13 @@ export class IngredientesComponent implements OnInit {
 
   // 👉 Guardar cambios
   guardar(f: FilaVisual) {
-    const dto = { ...f };
-    delete dto.editando;
-    delete dto.backup;
-    this.srv.updateIngrediente(f.id!, dto).subscribe({
-      next: (upd) => {
+    const dto: any = { ...f }; // ✅ CORRECTO
+delete dto.editando;
+delete dto.backup;
+
+
+    this.srv.update(f.id!, dto).subscribe({
+      next: (upd: Ingrediente) => {
         Object.assign(f, upd);
         f.editando = false;
         this.filtrarIngredientes();
@@ -95,7 +97,7 @@ export class IngredientesComponent implements OnInit {
   // 👉 Eliminar ingrediente
   eliminar(f: FilaVisual) {
     if (!confirm(`¿Eliminar "${f.nombre_ingrediente}"?`)) return;
-    this.srv.deleteIngrediente(f.id!).subscribe({
+    this.srv.delete(f.id!).subscribe({
       next: () => {
         this.ingredientes = this.ingredientes.filter((i) => i.id !== f.id);
         this.filtrarIngredientes();

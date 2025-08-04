@@ -1,4 +1,3 @@
-// frontend/src/app/services/ingrediente.service.ts
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
@@ -7,7 +6,7 @@ export interface Ingrediente {
   id?: number;
   nombre_ingrediente: string;
   unidad_medida: string;
-  precioKg: number; // ✅ nombre corregido
+  precioKg: number;
   peso: number;
   pesoKg: number;
   grupo: string;
@@ -20,19 +19,21 @@ export class IngredienteService {
 
   constructor(private http: HttpClient) {}
 
-  getIngredientes(): Observable<Ingrediente[]> {
+  // Usado en cargarIngredientesDisponibles()
+  findAll(): Observable<Ingrediente[]> {
     return this.http.get<Ingrediente[]>(this.api);
   }
 
-  createIngrediente(dto: Partial<Ingrediente>): Observable<Ingrediente> {
+  // Opcional si vas a crear desde el frontend
+  create(dto: Partial<Ingrediente>): Observable<Ingrediente> {
     return this.http.post<Ingrediente>(this.api, dto);
   }
 
-  updateIngrediente(id: number, dto: Partial<Ingrediente>): Observable<Ingrediente> {
+  update(id: number, dto: Partial<Ingrediente>): Observable<Ingrediente> {
     return this.http.put<Ingrediente>(`${this.api}/${id}`, dto);
   }
 
-  deleteIngrediente(id: number): Observable<void> {
+  delete(id: number): Observable<void> {
     return this.http.delete<void>(`${this.api}/${id}`);
   }
 }

@@ -38,14 +38,14 @@ export const routes: Routes = [
         title: 'Ingredientes'
       },
       {
-        path: 'fichas',
-        loadComponent: () => import('./pages/fichas/fichas.component').then(m => m.FichasComponent),
-        title: 'Fichas'
-      },
-      {
         path: 'recetas',
         loadComponent: () => import('./pages/recetas/recetas.component').then(m => m.RecetasComponent),
         title: 'Recetas'
+      },
+      {
+        path: 'recetas/:id',
+        loadComponent: () => import('./pages/recetas/recetas.component').then(m => m.RecetasComponent),
+        title: 'Ficha Técnica'
       },
       {
         path: 'compras',
@@ -59,15 +59,8 @@ export const routes: Routes = [
       },
       {
         path: 'listar-recetas',
-        loadComponent: () =>
-          import('./pages/listar/listar-recetas.component').then(m => m.ListarRecetasComponent),
+        loadComponent: () => import('./pages/listar/listar-recetas.component').then(m => m.ListarRecetasComponent),
         title: 'Listar Recetas'
-      },
-      {
-        path: 'consultar-receta/:id',
-        loadComponent: () =>
-          import('./pages/recetas/consultar/consultar-receta.component').then(m => m.ConsultarRecetaComponent),
-        title: 'Ficha Técnica'
       }
     ]
   },

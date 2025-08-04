@@ -1,74 +1,90 @@
-.contenedor {
-  max-width: 1000px;
-  margin: 40px auto;
+.contenedor-receta {
+  max-width: 960px;
+  margin: auto;
   padding: 20px;
   font-family: Arial, sans-serif;
+  background-color: #fefefe;
+  border-radius: 10px;
+  border: 1px solid #ccc;
 }
 
-h2 {
+.titulo {
+  color: #003366;
   text-align: center;
-  margin-bottom: 30px;
-  color: #2c3e50;
+  font-size: 28px;
+  margin-bottom: 10px;
 }
 
-.buscador {
-  text-align: center;
-  margin-bottom: 20px;
+.fecha {
+  text-align: right;
+  font-size: 14px;
+  color: gray;
 }
 
-.buscador input {
-  padding: 10px;
-  width: 300px;
-  border-radius: 5px;
-  border: 1px solid #aaa;
+.seccion {
+  margin-top: 30px;
 }
 
-table {
-  width: 100%;
-  border-collapse: collapse;
-  margin-bottom: 30px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-}
-
-table th, table td {
-  padding: 12px;
-  text-align: center;
-  border-bottom: 1px solid #ddd;
-}
-
-table thead {
-  background-color: #f57c00;
-  color: white;
+.subtitulo {
+  font-size: 20px;
+  color: #004080;
+  margin-bottom: 10px;
 }
 
 .formulario {
-  display: flex;
-  flex-wrap: wrap;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
   gap: 10px;
-  justify-content: center;
+  margin-bottom: 15px;
 }
 
-.formulario input {
-  padding: 10px;
-  width: 200px;
+.formulario label {
+  display: flex;
+  flex-direction: column;
+  font-weight: bold;
+  color: #333;
+}
+
+input, select {
+  padding: 6px;
+  border-radius: 6px;
   border: 1px solid #ccc;
-  border-radius: 5px;
 }
 
-.formulario button {
-  padding: 10px 20px;
-  background-color: #f57c00;
+button {
+  padding: 8px 14px;
+  margin-top: 8px;
+  background-color: #0066cc;
   color: white;
   border: none;
-  border-radius: 5px;
+  border-radius: 6px;
   cursor: pointer;
 }
 
-.formulario button:hover {
-  background-color: #e65100;
+button:hover {
+  background-color: #004c99;
 }
 
-.no-resultados {
+.tabla {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 10px;
+}
+
+.tabla th, .tabla td {
+  border: 1px solid #ccc;
+  padding: 8px;
   text-align: center;
-  color: #888;
+}
+
+.tabla th {
+  background-color: #e6f2ff;
+  color: #003366;
+}
+
+.total {
+  text-align: right;
+  margin-top: 15px;
+  font-weight: bold;
+  font-size: 16px;
 }

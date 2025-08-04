@@ -1,39 +1,40 @@
 // src/app/services/receta-ingrediente.service.ts
-
-import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
+import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 
-@Injectable({
-  providedIn: 'root',
-})
+interface CrearRelacion {
+  id_receta: number;
+  id_ingrediente: number;
+  cantidad_usada: number;
+}
+
+@Injectable({ providedIn: 'root' })
 export class RecetaIngredienteService {
-  private apiUrl = 'http://localhost:3000/recetas-ingredientes';
+  private api = 'http://localhost:3000/recetas-ingredientes';
 
   constructor(private http: HttpClient) {}
 
-  // Obtener todos los ingredientes de una receta
-  getPorReceta(idReceta: number): Observable<any[]> {
-    return this.http.get<any[]>(`${this.apiUrl}/receta/${idReceta}`);
+  // ✅ Crear relación entre receta e ingrediente
+  create(data: CrearRelacion): Observable<any> {
+    return this.http.post<any>(this.api, data);
   }
 
-  // Obtener todos los ingredientes de todas las recetas
-  getTodos(): Observable<any[]> {
-    return this.http.get<any[]>(this.apiUrl);
+  // ✅ Eliminar un ingrediente de una receta
+  remove(id_receta: number, id_ingrediente: number): Observable<any> {
+    return this.http.delete<any>(`${this.api}/${id_receta}/${id_ingrediente}`);
   }
 
-  // Agregar un ingrediente a una receta
-  agregar(dto: any): Observable<any> {
-    return this.http.post<any>(this.apiUrl, dto);
+  // ✅ Actualizar cantidad usada de un ingrediente en la receta
+  updateCantidad(id_receta: number, id_ingrediente: number, cantidad: number): Observable<any> {
+    return this.http.patch<any>(
+      `${this.api}/actualizar-cantidad?id_receta=${id_receta}&id_ingrediente=${id_ingrediente}&nueva=${cantidad}`,
+      {}
+    );
   }
 
-  // Actualizar un ingrediente
-  actualizar(idReceta: number, idIngrediente: number, dto: any): Observable<any> {
-    return this.http.put<any>(`${this.apiUrl}/${idReceta}/${idIngrediente}`, dto);
-  }
-
-  // Eliminar un ingrediente de una receta
-  eliminar(idReceta: number, idIngrediente: number): Observable<any> {
-    return this.http.delete<any>(`${this.apiUrl}/${idReceta}/${idIngrediente}`);
+  // ✅ Obtener todos los ingredientes de una receta
+  findByReceta(id_receta: number): Observable<any[]> {
+    return this.http.get<any[]>(`${this.api}/receta/${id_receta}`);
   }
 }
