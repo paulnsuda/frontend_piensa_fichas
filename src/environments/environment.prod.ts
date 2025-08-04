@@ -1,5 +1,5 @@
 // src/environments/environment.prod.ts
 export const environment = {
   production: true,
-  apiUrl: 'https://tuservidor.com/api' // reemplaza con tu dominio en producción
+  apiUrl: 'https://backend-piensa-fichas.onrender.com'  // ← tu URL definitiva
 };
