@@ -1,34 +1,35 @@
-import { Component } from '@angular/core';
-import { Router } from '@angular/router';
-import { AuthService } from '../../guards/auth.service';
+import { Component }   from '@angular/core';
+import { Router }      from '@angular/router';
 import { FormsModule } from '@angular/forms';
-import { CommonModule } from '@angular/common';
+import { CommonModule }from '@angular/common';
+
+import { AuthService, LoginResponse } from '../../guards/auth.service';
 
 @Component({
-  selector: 'app-login',
-  standalone: true,
-  imports: [FormsModule, CommonModule],
+  selector   : 'app-login',
+  standalone : true,
+  imports    : [FormsModule, CommonModule],
   templateUrl: './login.component.html',
-  styleUrls: ['./login.component.css']
+  styleUrls  : ['./login.component.css']
 })
 export class LoginComponent {
+
   form = {
-    email: '',
+    email   : '',
     password: ''
   };
 
-  constructor(private authService: AuthService, private router: Router) {}
+  constructor(private auth: AuthService,
+              private router: Router) {}
 
-  login() {
-    this.authService.login(this.form).subscribe({
-      next: (res) => {
-        // CAMBIO AQUÍ: el token viene como 'access_token'
-        this.authService.setToken(res.access_token);
+  login(): void {
+    this.auth.login(this.form).subscribe({
+      next : (_: LoginResponse) => {
+        /* El JWT ya se guardó en el servicio → sólo redirigimos */
         this.router.navigate(['/home']);
       },
-      error: (err) => {
-        alert('Error al iniciar sesión: ' + err.error.message);
-      }
+      error: (err) =>
+        alert('Error al iniciar sesión: ' + (err.error?.message ?? '')),
     });
   }
 }

@@ -2,6 +2,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
+import { environment } from '../../environments/environment';   // 👈 importa env
 
 interface CrearRelacion {
   id_receta: number;
@@ -11,29 +12,33 @@ interface CrearRelacion {
 
 @Injectable({ providedIn: 'root' })
 export class RecetaIngredienteService {
-  private api = 'http://localhost:3000/recetas-ingredientes';
+
+  /* URL base dinámica */
+  private api = `${environment.apiUrl}/recetas-ingredientes`;
 
   constructor(private http: HttpClient) {}
 
-  // ✅ Crear relación entre receta e ingrediente
+  /* ---------- CRUD relación receta-ingrediente ---------- */
+
+  /** Crear relación entre receta e ingrediente */
   create(data: CrearRelacion): Observable<any> {
     return this.http.post<any>(this.api, data);
   }
 
-  // ✅ Eliminar un ingrediente de una receta
+  /** Eliminar un ingrediente de una receta */
   remove(id_receta: number, id_ingrediente: number): Observable<any> {
     return this.http.delete<any>(`${this.api}/${id_receta}/${id_ingrediente}`);
   }
 
-  // ✅ Actualizar cantidad usada de un ingrediente en la receta
+  /** Actualizar cantidad usada */
   updateCantidad(id_receta: number, id_ingrediente: number, cantidad: number): Observable<any> {
-    return this.http.patch<any>(
-      `${this.api}/actualizar-cantidad?id_receta=${id_receta}&id_ingrediente=${id_ingrediente}&nueva=${cantidad}`,
-      {}
-    );
+    const url =
+      `${this.api}/actualizar-cantidad?` +
+      `id_receta=${id_receta}&id_ingrediente=${id_ingrediente}&nueva=${cantidad}`;
+    return this.http.patch<any>(url, {});
   }
 
-  // ✅ Obtener todos los ingredientes de una receta
+  /** Obtener todos los ingredientes de una receta */
   findByReceta(id_receta: number): Observable<any[]> {
     return this.http.get<any[]>(`${this.api}/receta/${id_receta}`);
   }

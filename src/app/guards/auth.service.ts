@@ -1,72 +1,78 @@
+// src/app/services/auth.service.ts
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { environment } from '../../environments/environment';
-import { Observable } from 'rxjs';
-import { tap } from 'rxjs/operators';
+import { Router }      from '@angular/router';
+import { tap, Observable } from 'rxjs';
+import { environment }     from '../../environments/environment';
 
-@Injectable({
-  providedIn: 'root'
-})
+export interface LoginResponse {
+  access_token: string;
+  user:        any;
+}
+
+@Injectable({ providedIn: 'root' })
 export class AuthService {
+
   private readonly TOKEN_KEY = 'token';
+  private readonly BASE      = environment.apiUrl;  // https://backend-piensa-fichas.onrender.com
 
-  constructor(private http: HttpClient) {}
+  /* ---------------- ctor ---------------- */
+  constructor(private http: HttpClient,
+              private router: Router) {}
 
-  login(credentials: any): Observable<any> {
-    return this.http.post<{ access_token: string, user: any }>(`${environment.apiUrl}/auth/login`, credentials)
-      .pipe(
-        tap(response => {
-          this.setToken(response.access_token);
-        })
-      );
+  /* --------------- end-points --------------- */
+  login(dto: { email: string; password: string }): Observable<LoginResponse> {
+    return this.http
+      .post<LoginResponse>(`${this.BASE}/auth/login`, dto)
+      .pipe(tap(res => this.saveToken(res.access_token)));
   }
 
-  register(data: any): Observable<any> {
-    return this.http.post(`${environment.apiUrl}/auth/register`, data);
+  register(dto: any) {
+    return this.http.post(`${this.BASE}/auth/register`, dto);
   }
 
+  /* --------------- sesión --------------- */
   logout(): void {
     localStorage.removeItem(this.TOKEN_KEY);
-    window.location.href = '/login'; // Redirigir al login tras cerrar sesión
+    this.router.navigateByUrl('/login');
   }
 
-  setToken(token: string): void {
-    localStorage.setItem(this.TOKEN_KEY, token);
+  /* --------------- getters utils --------------- */
+  /** Nuevo wrapper para código legado (interceptores, etc.) */
+  getToken(): string | null {              // 👈 añadido
+    return this.token;
   }
 
-  getToken(): string | null {
+  /** Getter moderna (puedes usarla directamente) */
+  get token(): string | null {
     return localStorage.getItem(this.TOKEN_KEY);
   }
 
   isLoggedIn(): boolean {
-    const token = this.getToken();
-    return !!token && this.isTokenValid(token);
+    const t = this.token;
+    return !!t && this.isTokenValid(t);
   }
 
   getUserRole(): string | null {
-    const token = this.getToken();
-    if (!token || !this.isTokenValid(token)) return null;
+    const t = this.token;
+    if (!t || !this.isTokenValid(t)) { return null; }
 
     try {
-      const payload = JSON.parse(atob(token.split('.')[1]));
-      return payload.role || payload.rol || null;
-    } catch (e) {
-      console.error('Error al decodificar token:', e);
-      return null;
-    }
+      const payload = JSON.parse(atob(t.split('.')[1]));
+      return payload.role ?? payload.rol ?? null;
+    } catch { return null; }
+  }
+
+  /* --------------- privados --------------- */
+  private saveToken(token: string): void {
+    localStorage.setItem(this.TOKEN_KEY, token);
   }
 
   private isTokenValid(token: string): boolean {
-    const parts = token.split('.');
-    if (parts.length !== 3) return false;
-
     try {
-      const payload = atob(parts[1]);
-      JSON.parse(payload); // lanza error si no es un JSON válido
+      const [, payload] = token.split('.');
+      JSON.parse(atob(payload));
       return true;
-    } catch (e) {
-      console.error('Token inválido:', e);
-      return false;
-    }
+    } catch { return false; }
   }
 }

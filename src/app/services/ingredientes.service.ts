@@ -1,6 +1,8 @@
+// src/app/services/ingrediente.service.ts
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { environment } from '../../environments/environment';   // 👈 importa environment
 
 export interface Ingrediente {
   id?: number;
@@ -15,16 +17,17 @@ export interface Ingrediente {
 
 @Injectable({ providedIn: 'root' })
 export class IngredienteService {
-  private api = 'http://localhost:3000/ingredientes';
+
+  /* URL base dinámica (dev → localhost, prod → Render) */
+  private api = `${environment.apiUrl}/ingredientes`;
 
   constructor(private http: HttpClient) {}
 
-  // Usado en cargarIngredientesDisponibles()
+  /* === CRUD === */
   findAll(): Observable<Ingrediente[]> {
     return this.http.get<Ingrediente[]>(this.api);
   }
 
-  // Opcional si vas a crear desde el frontend
   create(dto: Partial<Ingrediente>): Observable<Ingrediente> {
     return this.http.post<Ingrediente>(this.api, dto);
   }

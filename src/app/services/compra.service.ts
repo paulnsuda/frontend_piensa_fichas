@@ -1,6 +1,8 @@
+// src/app/services/compra.service.ts
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { environment } from '../../environments/environment';   // 👈 importa env
 
 export interface Compra {
   id?: number;
@@ -11,11 +13,11 @@ export interface Compra {
   fecha_compra: string;
 }
 
-@Injectable({
-  providedIn: 'root'
-})
+@Injectable({ providedIn: 'root' })
 export class CompraService {
-  private apiUrl = 'http://localhost:3000/compras';
+
+  /* URL dinámica según entorno */
+  private apiUrl = `${environment.apiUrl}/compras`;
 
   constructor(private http: HttpClient) {}
 
@@ -27,7 +29,7 @@ export class CompraService {
     return this.http.post<Compra>(this.apiUrl, compra);
   }
 
-  eliminarCompra(id: number): Observable<any> {
-    return this.http.delete(`${this.apiUrl}/${id}`);
+  eliminarCompra(id: number): Observable<void> {
+    return this.http.delete<void>(`${this.apiUrl}/${id}`);
   }
 }

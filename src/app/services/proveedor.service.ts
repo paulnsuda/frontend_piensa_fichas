@@ -1,6 +1,8 @@
+// src/app/services/proveedor.service.ts
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { environment } from '../../environments/environment';   // 👈 importa env
 
 export interface Proveedor {
   id?: number;
@@ -9,14 +11,15 @@ export interface Proveedor {
   descripcion?: string;
 }
 
-@Injectable({
-  providedIn: 'root'
-})
+@Injectable({ providedIn: 'root' })
 export class ProveedorService {
-  private apiUrl = 'http://localhost:3000/proveedores'; // Ajusta el puerto si es necesario
+
+  /* URL base dinámica: dev → localhost, prod → Render */
+  private apiUrl = `${environment.apiUrl}/proveedores`;
 
   constructor(private http: HttpClient) {}
 
+  /* ---------- CRUD ---------- */
   getProveedores(): Observable<Proveedor[]> {
     return this.http.get<Proveedor[]>(this.apiUrl);
   }
@@ -25,12 +28,11 @@ export class ProveedorService {
     return this.http.post<Proveedor>(this.apiUrl, proveedor);
   }
 
-  // (opcional) para editar o eliminar
   actualizarProveedor(id: number, proveedor: Proveedor): Observable<Proveedor> {
     return this.http.put<Proveedor>(`${this.apiUrl}/${id}`, proveedor);
   }
 
-  eliminarProveedor(id: number): Observable<any> {
-    return this.http.delete(`${this.apiUrl}/${id}`);
+  eliminarProveedor(id: number): Observable<void> {
+    return this.http.delete<void>(`${this.apiUrl}/${id}`);
   }
 }
