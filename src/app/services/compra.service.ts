@@ -1,22 +1,31 @@
-// src/app/services/compra.service.ts
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { environment } from '../../environments/environment';   // 👈 importa env
+import { environment } from '../../environments/environment';
 
+// Interfaz actualizada para coincidir con el Backend
 export interface Compra {
   id?: number;
-  descripcion: string;
-  proveedorId: number;
+  nombre_presentacion: string; // Antes descripcion
+  id_proveedor: number;        // Antes proveedorId
+  id_ingrediente: number;      // 👈 Nuevo campo vital
   peso_kg: number;
-  costo_total: number;
-  fecha_compra: string;
+  costo_final: number;         // Antes costo_total
+  precio_compra?: number;
+  unidad_compra?: string;
+  rendimiento?: number;
+  factor_correccion?: number;
+  fecha_compra?: string;
+  
+  // Campos opcionales para la vista (si vienen del backend poblados)
+  descripcion?: string; 
+  proveedor?: any;
+  ingrediente?: any;
 }
 
 @Injectable({ providedIn: 'root' })
 export class CompraService {
 
-  /* URL dinámica según entorno */
   private apiUrl = `${environment.apiUrl}/compras`;
 
   constructor(private http: HttpClient) {}

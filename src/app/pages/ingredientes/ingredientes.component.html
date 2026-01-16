@@ -1,133 +1,135 @@
-<h1 class="titulo">Gestionar Ingredientes</h1>
+<h1 class="text-3xl font-bold text-center text-gray-800 mb-8">Gestionar Ingredientes</h1>
 
-<!-- 🧩 Crear Grupo -->
-<div class="crear-grupo">
-  <h2 class="subtitulo">Crear Grupo</h2>
-  <div class="fila-formulario">
-    <div class="columna">
-      <label>Nombre del Grupo</label>
-      <input [(ngModel)]="nuevoGrupo.nombre" class="input" />
+<div class="bg-white p-6 rounded-lg shadow mb-8">
+  <h2 class="text-xl font-semibold text-gray-700 mb-4 border-b pb-2">Crear Grupo</h2>
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-4 items-end">
+    
+    <div>
+      <label class="block text-sm font-medium text-gray-700 mb-1">Nombre del Grupo</label>
+      <input [(ngModel)]="nuevoGrupo.nombre" class="w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 outline-none" placeholder="Ej. Lácteos" />
     </div>
-    <div class="columna">
-      <label>Descripción</label>
-      <input [(ngModel)]="nuevoGrupo.descripcion" class="input" />
+    
+    <div>
+      <label class="block text-sm font-medium text-gray-700 mb-1">Descripción</label>
+      <input [(ngModel)]="nuevoGrupo.descripcion" class="w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 outline-none" placeholder="Descripción breve" />
     </div>
-    <div class="columna">
-      <button (click)="agregarGrupo()" class="btn-verde">Agregar Grupo</button>
-    </div>
+    
+    <button (click)="agregarGrupo()" class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded transition">
+      Agregar Grupo
+    </button>
   </div>
 </div>
 
-<!-- 🔻 Agregar Ingrediente -->
-<h2 class="subtitulo">Agregar Ingrediente</h2>
+<div class="bg-white p-6 rounded-lg shadow mb-8">
+  <h2 class="text-xl font-semibold text-gray-700 mb-4 border-b pb-2">Agregar Ingrediente</h2>
 
-<div class="fila-centrada">
-  <input
-    type="text"
-    placeholder="Buscar ingrediente…"
-    [(ngModel)]="busqueda"
-    (ngModelChange)="filtrarIngredientes()"
-    class="input largo"
-  />
+  <div class="mb-6">
+    <input
+      type="text"
+      placeholder="🔍 Buscar ingrediente existente..."
+      [(ngModel)]="busqueda"
+      (ngModelChange)="filtrarIngredientes()"
+      class="w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 outline-none"
+    />
+  </div>
+
+  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 items-end">
+    <div>
+      <label class="block text-sm font-medium text-gray-700 mb-1">Nombre</label>
+      <input [(ngModel)]="nueva.nombre_ingrediente" class="w-full p-2 border border-gray-300 rounded outline-none focus:border-blue-500" />
+    </div>
+
+    <div>
+      <label class="block text-sm font-medium text-gray-700 mb-1">Unidad</label>
+      <select [(ngModel)]="nueva.unidad_medida" class="w-full p-2 border border-gray-300 rounded outline-none focus:border-blue-500 bg-white">
+        <option value="g">g (Gramos)</option>
+        <option value="kg">kg (Kilogramos)</option>
+        <option value="lb">lb (Libras)</option>
+        <option value="ml">ml (Mililitros)</option>
+        <option value="l">l (Litros)</option>
+        <option value="u">u (Unidad)</option>
+      </select>
+    </div>
+
+    <div>
+      <label class="block text-sm font-medium text-gray-700 mb-1">Precio por Kg/Unidad</label>
+      <input type="number" [(ngModel)]="nueva.precioKg" class="w-full p-2 border border-gray-300 rounded outline-none focus:border-blue-500" placeholder="0.00" />
+    </div>
+
+    <div>
+      <label class="block text-sm font-medium text-gray-700 mb-1">Peso Inicial</label>
+      <input type="number" [(ngModel)]="nueva.peso" class="w-full p-2 border border-gray-300 rounded outline-none focus:border-blue-500" placeholder="0" />
+    </div>
+
+    <div>
+      <label class="block text-sm font-medium text-gray-700 mb-1">Grupo</label>
+      <input [(ngModel)]="nueva.grupo" class="w-full p-2 border border-gray-300 rounded outline-none focus:border-blue-500" placeholder="Ej. Frutas" />
+    </div>
+  </div>
+
+  <div class="mt-4 flex justify-end">
+    <button (click)="agregar()" class="w-full sm:w-auto bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded transition shadow">
+      + Agregar Ingrediente
+    </button>
+  </div>
 </div>
 
-<div class="fila-formulario">
-  <div class="columna">
-    <label>Nombre</label>
-    <input [(ngModel)]="nueva.nombre_ingrediente" class="input" />
-  </div>
+<div class="bg-white rounded-lg shadow overflow-x-auto">
+  <table class="w-full text-left border-collapse">
+    <thead class="bg-gray-100 text-gray-700 uppercase text-xs">
+      <tr>
+        <th class="p-3 border-b">Nombre</th>
+        <th class="p-3 border-b">Unidad</th>
+        <th class="p-3 border-b">Precio Ref</th>
+        <th class="p-3 border-b">Stock</th>
+        <th class="p-3 border-b">Grupo</th>
+        <th class="p-3 border-b text-center">Acciones</th>
+      </tr>
+    </thead>
+    <tbody class="text-sm text-gray-700">
+      <tr *ngFor="let fila of ingredientesFiltrados" class="hover:bg-gray-50 border-b last:border-0">
+        <td class="p-3">
+          <ng-container *ngIf="!fila.editando; else edNombre">{{ fila.nombre_ingrediente }}</ng-container>
+          <ng-template #edNombre><input [(ngModel)]="fila.nombre_ingrediente" class="border rounded p-1 w-full" /></ng-template>
+        </td>
+        
+        <td class="p-3">
+          <ng-container *ngIf="!fila.editando; else edUni">{{ fila.unidad_medida }}</ng-container>
+          <ng-template #edUni>
+            <select [(ngModel)]="fila.unidad_medida" class="border rounded p-1">
+              <option value="g">g</option><option value="kg">kg</option><option value="u">u</option>
+            </select>
+          </ng-template>
+        </td>
 
-  <div class="columna">
-    <label>Unidad</label>
-    <select [(ngModel)]="nueva.unidad_medida" class="input">
-      <option value="g">g</option>
-      <option value="kg">kg</option>
-      <option value="lb">lb</option>
-    </select>
-  </div>
+        <td class="p-3">
+          <ng-container *ngIf="!fila.editando; else edPrecio">{{ fila.precioKg | number:'1.2-2' }} $</ng-container>
+          <ng-template #edPrecio><input type="number" [(ngModel)]="fila.precioKg" class="border rounded p-1 w-20" /></ng-template>
+        </td>
 
-  <div class="columna">
-    <label>Precio por Kg</label>
-    <input type="number" [(ngModel)]="nueva.precioKg" class="input" />
-  </div>
+        <td class="p-3 font-semibold text-blue-600">
+          <ng-container *ngIf="!fila.editando; else edPeso">{{ fila.peso | number:'1.2-2' }}</ng-container>
+          <ng-template #edPeso><input type="number" [(ngModel)]="fila.peso" class="border rounded p-1 w-20" /></ng-template>
+        </td>
 
-  <div class="columna">
-    <label>Peso</label>
-    <input type="number" [(ngModel)]="nueva.peso" class="input" />
-  </div>
+        <td class="p-3">
+          <ng-container *ngIf="!fila.editando; else edGrupo">{{ fila.grupo }}</ng-container>
+          <ng-template #edGrupo><input [(ngModel)]="fila.grupo" class="border rounded p-1 w-full" /></ng-template>
+        </td>
 
-  <div class="columna">
-    <label>Grupo</label>
-    <input [(ngModel)]="nueva.grupo" class="input" />
-  </div>
-
-  <div class="columna">
-    <button (click)="agregar()" class="btn-verde">Agregar Ingrediente</button>
-  </div>
+        <td class="p-3 text-center">
+          <div class="flex justify-center gap-2">
+            <ng-container *ngIf="!fila.editando">
+              <button (click)="editar(fila)" class="text-yellow-500 hover:text-yellow-700 font-bold">✏️</button>
+              <button (click)="eliminar(fila)" class="text-red-500 hover:text-red-700 font-bold">🗑️</button>
+            </ng-container>
+            <ng-container *ngIf="fila.editando">
+              <button (click)="guardar(fila)" class="text-green-600 hover:text-green-800 font-bold">💾</button>
+              <button (click)="cancelar(fila)" class="text-gray-500 hover:text-gray-700 font-bold">↩️</button>
+            </ng-container>
+          </div>
+        </td>
+      </tr>
+    </tbody>
+  </table>
 </div>
-
-<!-- 📋 Tabla -->
-<table class="tabla">
-  <thead>
-    <tr>
-      <th>Nombre</th>
-      <th>Unidad</th>
-      <th>Precio por Kg</th>
-      <th>Peso</th>
-      <th>Peso (kg)</th>
-      <th>Grupo</th>
-      <th>Acciones</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr *ngFor="let fila of ingredientesFiltrados">
-      <td>
-        <ng-container *ngIf="!fila.editando; else edNombre">{{ fila.nombre_ingrediente }}</ng-container>
-        <ng-template #edNombre>
-          <input [(ngModel)]="fila.nombre_ingrediente" class="input" />
-        </ng-template>
-      </td>
-      <td>
-        <ng-container *ngIf="!fila.editando; else edUni">{{ fila.unidad_medida }}</ng-container>
-        <ng-template #edUni>
-          <select [(ngModel)]="fila.unidad_medida" class="input">
-            <option value="g">g</option>
-            <option value="kg">kg</option>
-            <option value="lb">lb</option>
-          </select>
-        </ng-template>
-      </td>
-      <td>
-        <ng-container *ngIf="!fila.editando; else edPrecioKg">
-          {{ fila.precioKg | number : '1.2-2' }}
-        </ng-container>
-        <ng-template #edPrecioKg>
-          <input type="number" [(ngModel)]="fila.precioKg" class="input" />
-        </ng-template>
-      </td>
-      <td>
-        <ng-container *ngIf="!fila.editando; else edPes">{{ fila.peso | number: '1.2-2' }}</ng-container>
-        <ng-template #edPes>
-          <input type="number" [(ngModel)]="fila.peso" class="input" />
-        </ng-template>
-      </td>
-      <td>{{ fila.pesoKg | number: '1.2-2' }}</td>
-      <td>
-        <ng-container *ngIf="!fila.editando; else edGru">{{ fila.grupo }}</ng-container>
-        <ng-template #edGru>
-          <input [(ngModel)]="fila.grupo" class="input" />
-        </ng-template>
-      </td>
-      <td>
-        <ng-container *ngIf="!fila.editando">
-          <button (click)="editar(fila)">✏️</button>
-          <button (click)="eliminar(fila)">🗑️</button>
-        </ng-container>
-        <ng-container *ngIf="fila.editando">
-          <button (click)="guardar(fila)">💾</button>
-          <button (click)="cancelar(fila)">↩️</button>
-        </ng-container>
-      </td>
-    </tr>
-  </tbody>
-</table>

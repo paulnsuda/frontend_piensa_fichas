@@ -1,10 +1,11 @@
 .login-card {
-  max-width: 400px;
+  width: 90%;             /* Ocupa el 90% en móviles */
+  max-width: 400px;       /* No pasa de 400px en PC */
   margin: 50px auto;
-  padding: 30px;
-  border-radius: 10px;
+  padding: 2rem;
+  border-radius: 12px;
   background-color: white;
-  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
   text-align: center;
 }
 

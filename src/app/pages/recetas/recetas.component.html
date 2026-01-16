@@ -1,166 +1,124 @@
-<div class="contenedor-receta p-6 bg-white rounded shadow">
-  <!-- Cabecera -->
-  <h2 class="titulo text-2xl font-bold mb-2">
-    Ficha Técnica: {{ recetaNombre }}
-  </h2>
-  <p class="fecha mb-4">Fecha: {{ today | date:'dd/MM/yyyy' }}</p>
+<div class="max-w-5xl mx-auto p-6 bg-gray-50 min-h-screen">
+  
+  <div class="flex justify-between items-center mb-6">
+    <h1 class="text-3xl font-bold text-gray-800">🍳 Nueva Ficha Técnica</h1>
+    <a routerLink="/listar-recetas" class="text-blue-600 hover:underline">Cancelar y Volver</a>
+  </div>
 
-  <!-- ▸ Formulario Agregar ingrediente -->
-  <div class="seccion mb-6">
-    <h3 class="subtitulo text-xl font-semibold mb-3">Agregar ingrediente</h3>
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+    
+    <div class="lg:col-span-1 space-y-6">
+      <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+        <h2 class="font-bold text-gray-700 mb-4 border-b pb-2">1. Datos del Plato</h2>
+        
+        <div class="mb-4">
+          <label class="block text-sm font-medium text-gray-600 mb-1">Nombre de la Receta</label>
+          <input [(ngModel)]="nuevaReceta.nombre_receta" type="text" 
+                 class="w-full border border-gray-300 rounded p-2 focus:ring-2 focus:ring-blue-500 outline-none" 
+                 placeholder="Ej. Pollo al Horno">
+        </div>
 
-    <div class="formulario grid grid-cols-1 md:grid-cols-2 gap-4">
-      <!-- Ingrediente -->
-      <label class="block">
-        Ingrediente:
-        <select
-          [(ngModel)]="nuevoIngrediente.ingredienteId"
-          (ngModelChange)="onIngredienteChange()"
-          class="w-full border rounded p-1"
-        >
-          <option [ngValue]="null">-- Seleccionar --</option>
-          <option
-            *ngFor="let ing of ingredientesDisponibles"
-            [value]="ing.id"
-          >
-            {{ ing.nombre_ingrediente }}
-            -
-            {{ ing.precioKg | number:'1.2-2' }}
-            x
-            {{ ing.unidad_medida }}
-          </option>
-        </select>
-      </label>
+        <div class="mb-4">
+          <label class="block text-sm font-medium text-gray-600 mb-1">Tipo de Plato</label>
+          <select [(ngModel)]="nuevaReceta.tipo_plato" class="w-full border border-gray-300 rounded p-2">
+            <option value="Plato Principal">Plato Principal</option>
+            <option value="Entrada">Entrada</option>
+            <option value="Postre">Postre</option>
+            <option value="Bebida">Bebida</option>
+          </select>
+        </div>
 
-      <!-- Cantidad -->
-      <label class="block">
-        Cantidad:
-        <input
-          type="number"
-          [(ngModel)]="nuevoIngrediente.cantidad"
-          class="w-full border rounded p-1"
-        />
-      </label>
+        <div class="grid grid-cols-2 gap-4">
+          <div>
+            <label class="block text-sm font-medium text-gray-600 mb-1">N° Porciones</label>
+            <input [(ngModel)]="nuevaReceta.num_porciones" type="number" class="w-full border p-2 rounded">
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-600 mb-1">Tamaño Porción</label>
+            <input [(ngModel)]="nuevaReceta.tamano_porcion" type="text" class="w-full border p-2 rounded" placeholder="Ej. 250g">
+          </div>
+        </div>
+      </div>
 
-      <!-- Unidad -->
-      <label class="block">
-        Unidad:
-        <input
-          type="text"
-          [(ngModel)]="nuevoIngrediente.unidad"
-          class="w-full border rounded p-1"
-          readonly
-        />
-      </label>
-
-      <!-- Costo unitario -->
-      <label class="block">
-        Costo unitario:
-        <input
-          type="text"
-          [value]="nuevoIngrediente.costo_unitario | number:'1.2-2'"
-          class="w-full border rounded p-1"
-          readonly
-        />
-      </label>
-
-      <div class="col-span-full">
-        <button
-          class="bg-blue-600 text-white px-4 py-2 rounded"
-          (click)="agregarIngrediente()"
-        >
-          Agregar ingrediente
-        </button>
+      <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+        <h2 class="font-bold text-gray-700 mb-4 border-b pb-2">3. Procedimiento</h2>
+        <textarea [(ngModel)]="nuevaReceta.procedimiento" rows="6" 
+                  class="w-full border border-gray-300 rounded p-2 text-sm" 
+                  placeholder="Describe paso a paso la preparación..."></textarea>
       </div>
     </div>
-  </div>
 
-  <!-- ▸ Tabla de ingredientes -->
-  <div class="seccion mb-6">
-    <h3 class="subtitulo text-xl font-semibold mb-2">
-      Ingredientes registrados
-    </h3>
+    <div class="lg:col-span-2">
+      <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-200 h-full">
+        <h2 class="font-bold text-gray-700 mb-4 border-b pb-2">2. Composición (Ingredientes)</h2>
 
-    <table class="tabla w-full border-collapse border">
-      <thead class="bg-gray-200">
-        <tr>
-          <th class="border px-2 py-1">Ingrediente</th>
-          <th class="border px-2 py-1">Cantidad</th>
-          <th class="border px-2 py-1">Unidad</th>
-          <th class="border px-2 py-1">Costo unitario</th>
-          <th class="border px-2 py-1">Subtotal</th>
-          <th class="border px-2 py-1">Acciones</th>
-        </tr>
-      </thead>
+        <div class="bg-blue-50 p-4 rounded-lg mb-6 flex flex-wrap gap-4 items-end border border-blue-100">
+          <div class="flex-1 min-w-[200px]">
+            <label class="block text-xs font-bold text-blue-800 mb-1">Buscar Ingrediente</label>
+            <select [(ngModel)]="ingredienteSeleccionadoId" class="w-full border p-2 rounded">
+              <option [ngValue]="null">-- Seleccionar --</option>
+              <option *ngFor="let ing of listaIngredientes" [value]="ing.id">
+                {{ ing.nombre_ingrediente }} ($ {{ ing.precioKg }}/{{ ing.unidad_medida }})
+              </option>
+            </select>
+          </div>
 
-      <tbody>
-        <!-- Fila normal / edición -->
-        <tr *ngFor="let ing of ingredientes">
-          <!-- Vista normal -->
-          <ng-container *ngIf="editandoId !== ing.id_ingrediente; else editar">
-            <td class="border px-2 py-1">{{ ing.nombre }}</td>
-            <td class="border px-2 py-1">{{ ing.cantidad }}</td>
-            <td class="border px-2 py-1">{{ ing.unidad }}</td>
-            <td class="border px-2 py-1">
-              {{ ing.costo_unitario | number:'1.2-2' }}
-            </td>
-            <td class="border px-2 py-1">
-              {{ (ing.cantidad * ing.costo_unitario) | number:'1.2-2' }}
-            </td>
-            <td class="border px-2 py-1">
-              <button class="text-blue-600" (click)="editarIngrediente(ing)">
-                Editar
-              </button>
-              <button
-                class="text-red-600 ml-2"
-                (click)="eliminarIngrediente(ing.id_ingrediente)"
-              >
-                Eliminar
-              </button>
-            </td>
-          </ng-container>
+          <div class="w-32">
+            <label class="block text-xs font-bold text-blue-800 mb-1">Cantidad</label>
+            <input [(ngModel)]="cantidadAgregar" type="number" class="w-full border p-2 rounded" placeholder="0.00">
+          </div>
 
-          <!-- Vista edición -->
-          <ng-template #editar>
-            <td class="border px-2 py-1">{{ ing.nombre }}</td>
-            <td class="border px-2 py-1">
-              <input
-                name="cantEdit"
-                type="number"
-                [(ngModel)]="ingredienteEditado.cantidad_usada"
-                class="w-full border rounded p-1"
-              />
-            </td>
-            <td class="border px-2 py-1">{{ ing.unidad }}</td>
-            <td class="border px-2 py-1">
-              {{ ing.costo_unitario | number:'1.2-2' }}
-            </td>
-            <td class="border px-2 py-1">—</td>
-            <td class="border px-2 py-1">
-              <button class="text-green-700" (click)="guardarEdicion(ing)">
-                Guardar
-              </button>
-              <button class="text-gray-600 ml-2" (click)="cancelarEdicion()">
-                Cancelar
-              </button>
-            </td>
-          </ng-template>
-        </tr>
-      </tbody>
-    </table>
-  </div>
+          <button (click)="agregarIngrediente()" 
+                  class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 font-bold shadow">
+            + Agregar
+          </button>
+        </div>
 
-  <!-- ▸ Costo total -->
-  <div class="total text-lg font-semibold">
-    Costo total:
-    <span class="text-blue-700">
-      {{ costoTotal | number:'1.2-2' }} $
-    </span>
-  </div>
+        <div class="overflow-x-auto">
+          <table class="w-full text-sm text-left border-collapse">
+            <thead class="bg-gray-100 text-gray-600 uppercase text-xs">
+              <tr>
+                <th class="px-4 py-3 rounded-l-lg">Ingrediente</th>
+                <th class="px-4 py-3 text-right">Cant.</th>
+                <th class="px-4 py-3">Unidad</th>
+                <th class="px-4 py-3 text-right">Costo Est.</th>
+                <th class="px-4 py-3 rounded-r-lg text-center"></th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-100">
+              <tr *ngFor="let item of nuevaReceta.recetasIngredientes; let i = index">
+                <td class="px-4 py-3 font-medium text-gray-800">{{ item.nombre }}</td>
+                <td class="px-4 py-3 text-right">{{ item.cantidad_usada }}</td>
+                <td class="px-4 py-3 text-gray-500">{{ item.unidad }}</td>
+                <td class="px-4 py-3 text-right font-bold text-gray-700">$ {{ item.subtotal | number:'1.2-2' }}</td>
+                <td class="px-4 py-3 text-center">
+                  <button (click)="eliminarIngrediente(i)" class="text-red-500 hover:text-red-700 font-bold">✕</button>
+                </td>
+              </tr>
+              <tr *ngIf="nuevaReceta.recetasIngredientes.length === 0">
+                <td colspan="5" class="text-center py-8 text-gray-400 italic">
+                  No hay ingredientes agregados aún.
+                </td>
+              </tr>
+            </tbody>
+            <tfoot class="border-t-2 border-gray-200" *ngIf="nuevaReceta.recetasIngredientes.length > 0">
+              <tr>
+                <td colspan="3" class="px-4 py-4 text-right font-bold text-gray-600 uppercase">Costo Total Materia Prima:</td>
+                <td class="px-4 py-4 text-right font-black text-2xl text-green-600">$ {{ nuevaReceta.costo_receta | number:'1.2-2' }}</td>
+                <td></td>
+              </tr>
+            </tfoot>
+          </table>
+        </div>
+        
+        <div class="mt-8 text-right">
+          <button (click)="guardarReceta()" 
+                  class="bg-green-600 text-white px-8 py-3 rounded-lg shadow-lg hover:bg-green-700 font-bold text-lg w-full md:w-auto transition transform hover:scale-105">
+            💾 Guardar Ficha Técnica
+          </button>
+        </div>
 
-  <div class="mt-4">
-    <button class="bg-green-600 text-white px-4 py-2 rounded" (click)="imprimir()">
-      Imprimir
-    </button>
+      </div>
+    </div>
   </div>
 </div>

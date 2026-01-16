@@ -1,24 +1,55 @@
-<!-- layout.component.html -->
-<nav class="navbar">
-  <div class="logo">🍽️ Gestor Gastronómico</div>
+<nav class="bg-white shadow-md w-full mb-6">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="flex flex-col md:flex-row justify-between items-center py-4">
+      
+      <div class="mb-4 md:mb-0">
+        <div class="text-2xl font-bold text-gray-800 flex items-center gap-2">
+          <span>🍽️</span>
+          <span>Gestor Gastronómico</span>
+        </div>
+      </div>
 
-  <div class="nav-links">
-    <a routerLink="/home"        routerLinkActive="active">Inicio</a>
-    <a routerLink="/ingredientes" routerLinkActive="active">Ingredientes</a>
+      <div class="flex flex-wrap justify-center gap-4 items-center">
+        <a routerLink="/home" 
+           routerLinkActive="text-blue-600 bg-blue-50" 
+           class="px-3 py-2 rounded-md text-sm font-medium text-gray-600 hover:text-blue-600 hover:bg-gray-50 transition">
+           Inicio
+        </a>
+        <a routerLink="/ingredientes" 
+           routerLinkActive="text-blue-600 bg-blue-50" 
+           class="px-3 py-2 rounded-md text-sm font-medium text-gray-600 hover:text-blue-600 hover:bg-gray-50 transition">
+           Ingredientes
+        </a>
+        <a routerLink="/listar-recetas" 
+           routerLinkActive="text-blue-600 bg-blue-50" 
+           class="px-3 py-2 rounded-md text-sm font-medium text-gray-600 hover:text-blue-600 hover:bg-gray-50 transition">
+           Fichas
+        </a>
+        <a routerLink="/compras" 
+           routerLinkActive="text-blue-600 bg-blue-50" 
+           class="px-3 py-2 rounded-md text-sm font-medium text-gray-600 hover:text-blue-600 hover:bg-gray-50 transition">
+           Compras
+        </a>
+        <a routerLink="/proveedores" 
+           routerLinkActive="text-blue-600 bg-blue-50" 
+           class="px-3 py-2 rounded-md text-sm font-medium text-gray-600 hover:text-blue-600 hover:bg-gray-50 transition">
+           Proveedores
+        </a>
+      </div>
 
-    <!-- ⇢ listado de recetas (no pide :id) -->
-    <!-- siempre abre la ficha de la receta 1 -->
-<a [routerLink]="['/recetas', 1]" routerLinkActive="active">Fichas</a>
+      <div class="mt-4 md:mt-0 flex items-center gap-3">
+        <span *ngIf="rol" class="text-xs font-bold text-white bg-blue-500 px-2 py-1 rounded uppercase">
+          {{ rol }}
+        </span>
+        <button (click)="logout()" class="text-sm bg-red-100 text-red-600 hover:bg-red-200 px-4 py-2 rounded-md font-medium transition">
+          Cerrar sesión
+        </button>
+      </div>
 
-
-    <a routerLink="/compras"     routerLinkActive="active">Compras</a>
-    <a routerLink="/proveedores" routerLinkActive="active">Proveedores</a>
-
-    <span class="rol" *ngIf="rol">Rol: {{ rol }}</span>
-    <button (click)="logout()">Cerrar sesión</button>
+    </div>
   </div>
 </nav>
 
-<div class="contenido">
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-10">
   <router-outlet></router-outlet>
 </div>

@@ -1,0 +1,137 @@
+<div class="max-w-5xl mx-auto p-4 md:p-8 animate-fade-in" *ngIf="!cargando && receta; else loading">
+
+  <div class="flex justify-between mb-6 print:hidden">
+    <a routerLink="/listar-recetas" class="text-gray-600 hover:text-blue-600 flex items-center gap-2 font-medium">
+      ⬅ Volver al listado
+    </a>
+    <button (click)="imprimir()" class="bg-gray-900 text-white px-5 py-2 rounded shadow hover:bg-black transition flex items-center gap-2">
+      🖨️ Imprimir Ficha
+    </button>
+  </div>
+
+  <div class="bg-white shadow-2xl border border-gray-200 p-8 md:p-12 rounded-sm print:shadow-none print:border-none print:p-0">
+    
+    <header class="border-b-4 border-gray-900 pb-6 mb-8 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+      <div>
+        <h6 class="text-xs font-bold text-gray-500 uppercase tracking-widest mb-1">Ficha Técnica Estándar</h6>
+        <h1 class="text-4xl font-serif font-bold text-gray-900">{{ receta.nombre_receta }}</h1>
+        <div class="mt-2 flex gap-2">
+           <span class="inline-block bg-gray-100 text-gray-700 text-xs px-3 py-1 rounded-full uppercase font-bold tracking-wide">
+             {{ receta.tipo_plato || 'General' }}
+           </span>
+        </div>
+      </div>
+      
+      <div class="grid grid-cols-2 gap-x-8 gap-y-2 text-right bg-gray-50 p-4 rounded-lg border border-gray-100">
+        <div>
+          <span class="block text-[10px] text-gray-500 uppercase font-bold">Porciones (Pax)</span>
+          <span class="text-2xl font-serif font-bold text-gray-800">{{ receta.num_porciones }}</span>
+        </div>
+        <div>
+          <span class="block text-[10px] text-gray-500 uppercase font-bold">Tamaño Porción</span>
+          <span class="text-2xl font-serif font-bold text-gray-800">{{ receta.tamano_porcion }}</span>
+        </div>
+      </div>
+    </header>
+
+    <div class="mb-10">
+      <h3 class="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
+        <span class="text-xl">🧂</span> Desglose de Ingredientes
+      </h3>
+      
+      <div class="overflow-hidden border border-gray-300 rounded">
+        <table class="w-full text-sm text-left">
+          <thead class="bg-gray-100 text-gray-700 uppercase text-xs font-bold border-b border-gray-300">
+            <tr>
+              <th class="px-4 py-3 border-r border-gray-200">Ingrediente</th>
+              <th class="px-4 py-3 text-right border-r border-gray-200">Cantidad</th>
+              <th class="px-4 py-3 text-center border-r border-gray-200">Unidad</th>
+              <th class="px-4 py-3 text-right border-r border-gray-200">Costo Unit.</th>
+              <th class="px-4 py-3 text-right bg-gray-200">Subtotal</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-gray-200">
+            <tr *ngFor="let item of receta.recetasIngredientes" class="hover:bg-gray-50">
+              <td class="px-4 py-3 font-medium text-gray-900 border-r border-gray-100">
+                {{ item.ingrediente.nombre_ingrediente }}
+              </td>
+              <td class="px-4 py-3 text-right border-r border-gray-100 font-mono text-gray-600">
+                {{ item.cantidad_usada | number:'1.3-3' }}
+              </td>
+              <td class="px-4 py-3 text-center text-gray-500 border-r border-gray-100 text-xs uppercase">
+                {{ item.ingrediente.unidad_medida }}
+              </td>
+              <td class="px-4 py-3 text-right text-gray-500 border-r border-gray-100">
+                $ {{ item.ingrediente.precioKg | number:'1.2-2' }}
+              </td>
+              <td class="px-4 py-3 text-right font-bold text-gray-800 bg-gray-50">
+                $ {{ (item.cantidad_usada * item.ingrediente.precioKg) | number:'1.2-2' }}
+              </td>
+            </tr>
+          </tbody>
+          <tfoot class="bg-gray-100 border-t-2 border-gray-300">
+            <tr>
+              <td colspan="4" class="px-4 py-3 text-right font-bold text-gray-600 uppercase text-xs tracking-wider">
+                Costo Total Materia Prima:
+              </td>
+              <td class="px-4 py-3 text-right font-black text-gray-900 text-lg">
+                $ {{ costoTotal | number:'1.2-2' }}
+              </td>
+            </tr>
+          </tfoot>
+        </table>
+      </div>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
+      
+      <div class="md:col-span-2">
+        <h3 class="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
+          <span class="text-xl">🔥</span> Procedimiento
+        </h3>
+        <div class="prose text-gray-700 text-justify whitespace-pre-line bg-gray-50 p-6 rounded border border-gray-200 text-sm leading-relaxed">
+          {{ receta.procedimiento || 'No se ha detallado el procedimiento para esta receta.' }}
+        </div>
+      </div>
+
+      <div class="bg-blue-50 p-6 rounded-xl border border-blue-100 h-fit shadow-sm">
+        <h3 class="text-blue-900 font-bold uppercase text-xs tracking-widest mb-4 border-b border-blue-200 pb-2 text-center">
+          Rentabilidad
+        </h3>
+        
+        <div class="space-y-6">
+          <div class="flex justify-between items-end">
+            <span class="text-gray-600 text-xs uppercase font-semibold">Costo por Porción</span>
+            <span class="text-2xl font-bold text-gray-800">$ {{ costoPorcion | number:'1.2-2' }}</span>
+          </div>
+
+          <div class="flex justify-between items-end">
+            <span class="text-gray-600 text-xs uppercase font-semibold">Food Cost Objetivo</span>
+            <span class="font-bold text-blue-600 bg-blue-100 px-2 rounded">{{ foodCostPorcentaje }}%</span>
+          </div>
+
+          <div class="border-t-2 border-dashed border-blue-200 pt-4 mt-2">
+            <span class="block text-gray-500 text-[10px] uppercase tracking-wide mb-1 text-center">Precio de Venta Sugerido</span>
+            <div class="text-center bg-white border border-blue-200 rounded p-2 shadow-inner">
+               <span class="block text-3xl font-black text-green-600">$ {{ precioVentaSugerido | number:'1.2-2' }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <footer class="text-center border-t border-gray-200 pt-8 mt-12">
+      <p class="text-gray-400 text-[10px] uppercase tracking-widest">
+        Sistema Gestor Gastronómico • Documento Generado el {{ receta.fecha_creacion | date:'longDate' }}
+      </p>
+    </footer>
+
+  </div>
+</div>
+
+<ng-template #loading>
+  <div class="flex flex-col justify-center items-center py-40">
+    <div class="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-blue-900 mb-6"></div>
+    <p class="text-gray-500 font-medium animate-pulse">Cargando ficha técnica...</p>
+  </div>
+</ng-template>

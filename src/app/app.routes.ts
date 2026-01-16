@@ -9,7 +9,9 @@ export const authGuard = () => {
 };
 
 export const routes: Routes = [
-  // Públicas
+  // ======================================
+  // RUTAS PÚBLICAS
+  // ======================================
   {
     path: 'login',
     loadComponent: () => import('./pages/login/login.component').then(m => m.LoginComponent),
@@ -21,7 +23,9 @@ export const routes: Routes = [
     title: 'Registro'
   },
 
-  // Protegidas
+  // ======================================
+  // RUTAS PROTEGIDAS (LAYOUT PRINCIPAL)
+  // ======================================
   {
     path: '',
     loadComponent: () => import('./layout/layout.component').then(m => m.LayoutComponent),
@@ -37,15 +41,23 @@ export const routes: Routes = [
         loadComponent: () => import('./pages/ingredientes/ingredientes.component').then(m => m.IngredientesComponent),
         title: 'Ingredientes'
       },
+      // 1. Crear Receta (Formulario)
       {
         path: 'recetas',
         loadComponent: () => import('./pages/recetas/recetas.component').then(m => m.RecetasComponent),
-        title: 'Recetas'
+        title: 'Crear Receta'
       },
+      // 2. VER FICHA TÉCNICA (El cambio importante está aquí 👇)
       {
         path: 'recetas/:id',
-        loadComponent: () => import('./pages/recetas/recetas.component').then(m => m.RecetasComponent),
-        title: 'Ficha Técnica'
+        loadComponent: () => import('./pages/ver-ficha/ver-ficha.component').then(m => m.VerFichaComponent),
+        title: 'Ficha Técnica de Alta Cocina'
+      },
+      // 3. Listar Recetas (El Menú)
+      {
+        path: 'listar-recetas',
+        loadComponent: () => import('./pages/listar/listar-recetas.component').then(m => m.ListarRecetasComponent),
+        title: 'Listar Recetas'
       },
       {
         path: 'compras',
@@ -56,15 +68,12 @@ export const routes: Routes = [
         path: 'proveedores',
         loadComponent: () => import('./pages/proveedores/proveedores.component').then(m => m.ProveedoresComponent),
         title: 'Proveedores'
-      },
-      {
-        path: 'listar-recetas',
-        loadComponent: () => import('./pages/listar/listar-recetas.component').then(m => m.ListarRecetasComponent),
-        title: 'Listar Recetas'
       }
     ]
   },
 
-  // Redirección
+  // ======================================
+  // REDIRECCIÓN POR DEFECTO
+  // ======================================
   { path: '**', redirectTo: 'login' }
 ];

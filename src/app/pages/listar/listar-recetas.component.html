@@ -1,27 +1,46 @@
-<div class="max-w-4xl mx-auto p-6 bg-white rounded shadow">
-  <h2 class="text-2xl font-bold mb-4 text-center">Lista de Recetas</h2>
+<div class="max-w-4xl mx-auto p-6 bg-white rounded shadow animate-fade-in">
+  
+  <div class="flex justify-between items-center mb-6">
+    <h2 class="text-2xl font-bold text-gray-800">Lista de Recetas</h2>
+    <a routerLink="/recetas" class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 text-sm font-medium">
+      + Nueva Receta
+    </a>
+  </div>
 
-  <table class="table-auto w-full border border-collapse text-sm">
-    <thead class="bg-gray-100">
-      <tr>
-        <th class="border px-4 py-2 text-left">Nombre</th>
-        <th class="border px-4 py-2 text-right">Costo Total</th>
-        <th class="border px-4 py-2 text-center">Acciones</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr *ngFor="let r of recetas">
-        <td class="border px-4 py-2">{{ r.nombre }}</td>
-        <td class="border px-4 py-2 text-right">{{ r.costo_total | currency:'USD' }}</td>
-        <td class="border px-4 py-2 text-center">
-          <button
-            (click)="verFicha(r.id)"
-            class="bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700 text-sm"
-          >
-            Ver Ficha
-          </button>
-        </td>
-      </tr>
-    </tbody>
-  </table>
+  <div class="overflow-x-auto">
+    <table class="table-auto w-full border-collapse text-sm">
+      <thead class="bg-gray-800 text-white">
+        <tr>
+          <th class="px-4 py-3 text-left">Nombre</th>
+          <th class="px-4 py-3 text-right">Costo Total</th>
+          <th class="px-4 py-3 text-center">Acciones</th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-gray-200">
+        <tr *ngFor="let r of recetas" class="hover:bg-gray-50">
+          
+          <td class="px-4 py-3 font-medium text-gray-900">{{ r.nombre }}</td>
+          
+          <td class="px-4 py-3 text-right font-bold text-gray-700">
+            {{ r.costo_total | currency:'USD' }}
+          </td>
+          
+          <td class="px-4 py-3 text-center">
+            <a [routerLink]="['/recetas', r.id]" 
+               class="bg-blue-100 text-blue-600 hover:bg-blue-600 hover:text-white px-3 py-1.5 rounded transition text-sm font-medium inline-flex items-center gap-1 cursor-pointer decoration-0">
+               👁️ Ver Ficha
+            </a>
+          </td>
+
+        </tr>
+        
+        <tr *ngIf="recetas.length === 0">
+          <td colspan="3" class="text-center py-8 text-gray-500">
+            No tienes recetas creadas aún.
+          </td>
+        </tr>
+
+      </tbody>
+    </table>
+  </div>
 </div>

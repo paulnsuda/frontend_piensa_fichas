@@ -1,28 +1,37 @@
-import { Component, OnInit } from '@angular/core';
-import { RouterModule } from '@angular/router';
+import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { AuthService } from '../../guards/auth.service';
-import { Router } from '@angular/router';
-
+import { RouterModule } from '@angular/router'; // 👈 Importante para los enlaces
+import { DashboardService } from '../../services/dashboard.service';
 
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [CommonModule, RouterModule], // 👈 IMPORTANTE
+  imports: [CommonModule, RouterModule], // 👈 Agregamos RouterModule aquí
   templateUrl: './home.component.html',
   styleUrls: ['./home.component.css']
 })
 export class HomeComponent implements OnInit {
-  rol: string | null = null;
+  private dashboardService = inject(DashboardService);
+  
+  // Inicializamos los datos
+  stats: any = {
+    totalRecetas: 0,
+    totalIngredientes: 0,
+    valorInventario: 0,
+    ultimasCompras: [],
+    fechaActual: new Date() // 👈 Agregamos la fecha para el saludo
+  };
 
-  constructor(private auth: AuthService, private router: Router) {}
-
-  ngOnInit(): void {
-    this.rol = this.auth.getUserRole();
-  }
-
-  logout(): void {
-    this.auth.logout();
-    this.router.navigate(['/login']);
+  ngOnInit() {
+    this.dashboardService.getStats().subscribe({
+      next: (data) => {
+        // Mezclamos los datos del backend con la fecha local
+        this.stats = { 
+          ...data, 
+          fechaActual: new Date() 
+        };
+      },
+      error: (err) => console.error('Error cargando dashboard:', err)
+    });
   }
 }

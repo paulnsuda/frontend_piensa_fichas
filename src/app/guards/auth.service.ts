@@ -1,4 +1,3 @@
-// src/app/services/auth.service.ts
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Router }      from '@angular/router';
@@ -14,20 +13,30 @@ export interface LoginResponse {
 export class AuthService {
 
   private readonly TOKEN_KEY = 'token';
-  private readonly BASE      = environment.apiUrl;  // https://backend-piensa-fichas.onrender.com
+  
+  // 🔴 CORRECCIÓN AQUÍ:
+  // Forzamos la dirección local para desarrollo.
+  // Cuando subas a producción, descomenta la segunda línea y comenta la primera.
+  private readonly BASE = 'http://localhost:3000'; 
+  // private readonly BASE = environment.apiUrl; 
 
   /* ---------------- ctor ---------------- */
   constructor(private http: HttpClient,
               private router: Router) {}
 
   /* --------------- end-points --------------- */
+  
+  // Como tu controller tiene @Controller('auth'), la ruta base es /auth
+  
   login(dto: { email: string; password: string }): Observable<LoginResponse> {
+    // Esto generará: http://localhost:3000/auth/login
     return this.http
       .post<LoginResponse>(`${this.BASE}/auth/login`, dto)
       .pipe(tap(res => this.saveToken(res.access_token)));
   }
 
   register(dto: any) {
+    // Esto generará: http://localhost:3000/auth/register
     return this.http.post(`${this.BASE}/auth/register`, dto);
   }
 
@@ -38,12 +47,10 @@ export class AuthService {
   }
 
   /* --------------- getters utils --------------- */
-  /** Nuevo wrapper para código legado (interceptores, etc.) */
-  getToken(): string | null {              // 👈 añadido
+  getToken(): string | null {
     return this.token;
   }
 
-  /** Getter moderna (puedes usarla directamente) */
   get token(): string | null {
     return localStorage.getItem(this.TOKEN_KEY);
   }
@@ -59,6 +66,7 @@ export class AuthService {
 
     try {
       const payload = JSON.parse(atob(t.split('.')[1]));
+      // Soporte para ambos nombres de campo por si acaso
       return payload.role ?? payload.rol ?? null;
     } catch { return null; }
   }

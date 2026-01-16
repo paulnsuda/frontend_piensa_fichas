@@ -1,5 +1,5 @@
-// src/environments/environment.ts
 export const environment = {
   production: false,
-  apiUrl: 'https://backend-piensa-fichas.onrender.com' // ajusta el puerto según tu backend
+  // 👇 Cambiamos la nube por tu máquina local
+  apiUrl: 'http://localhost:3000' 
 };
