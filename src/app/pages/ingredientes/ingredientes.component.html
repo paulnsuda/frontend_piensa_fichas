@@ -3,17 +3,14 @@
 <div class="bg-white p-6 rounded-lg shadow mb-8">
   <h2 class="text-xl font-semibold text-gray-700 mb-4 border-b pb-2">Crear Grupo</h2>
   <div class="grid grid-cols-1 md:grid-cols-3 gap-4 items-end">
-    
     <div>
       <label class="block text-sm font-medium text-gray-700 mb-1">Nombre del Grupo</label>
       <input [(ngModel)]="nuevoGrupo.nombre" class="w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 outline-none" placeholder="Ej. Lácteos" />
     </div>
-    
     <div>
       <label class="block text-sm font-medium text-gray-700 mb-1">Descripción</label>
       <input [(ngModel)]="nuevoGrupo.descripcion" class="w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 outline-none" placeholder="Descripción breve" />
     </div>
-    
     <button (click)="agregarGrupo()" class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded transition">
       Agregar Grupo
     </button>
@@ -52,13 +49,13 @@
     </div>
 
     <div>
-      <label class="block text-sm font-medium text-gray-700 mb-1">Precio por Kg/Unidad</label>
-      <input type="number" [(ngModel)]="nueva.precioKg" class="w-full p-2 border border-gray-300 rounded outline-none focus:border-blue-500" placeholder="0.00" />
+      <label class="block text-sm font-medium text-gray-700 mb-1">Precio Ref ($)</label>
+      <input type="number" step="0.01" [(ngModel)]="nueva.precioKg" class="w-full p-2 border border-gray-300 rounded outline-none focus:border-blue-500" placeholder="0.00" />
     </div>
 
     <div>
-      <label class="block text-sm font-medium text-gray-700 mb-1">Peso Inicial</label>
-      <input type="number" [(ngModel)]="nueva.peso" class="w-full p-2 border border-gray-300 rounded outline-none focus:border-blue-500" placeholder="0" />
+      <label class="block text-sm font-medium text-gray-700 mb-1">Stock (Peso)</label>
+      <input type="number" step="0.01" [(ngModel)]="nueva.peso" class="w-full p-2 border border-gray-300 rounded outline-none focus:border-blue-500" placeholder="0" />
     </div>
 
     <div>
@@ -88,6 +85,7 @@
     </thead>
     <tbody class="text-sm text-gray-700">
       <tr *ngFor="let fila of ingredientesFiltrados" class="hover:bg-gray-50 border-b last:border-0">
+        
         <td class="p-3">
           <ng-container *ngIf="!fila.editando; else edNombre">{{ fila.nombre_ingrediente }}</ng-container>
           <ng-template #edNombre><input [(ngModel)]="fila.nombre_ingrediente" class="border rounded p-1 w-full" /></ng-template>
@@ -98,18 +96,23 @@
           <ng-template #edUni>
             <select [(ngModel)]="fila.unidad_medida" class="border rounded p-1">
               <option value="g">g</option><option value="kg">kg</option><option value="u">u</option>
+              <option value="ml">ml</option><option value="l">l</option>
             </select>
           </ng-template>
         </td>
 
         <td class="p-3">
           <ng-container *ngIf="!fila.editando; else edPrecio">{{ fila.precioKg | number:'1.2-2' }} $</ng-container>
-          <ng-template #edPrecio><input type="number" [(ngModel)]="fila.precioKg" class="border rounded p-1 w-20" /></ng-template>
+          <ng-template #edPrecio>
+            <input type="number" step="0.01" [(ngModel)]="fila.precioKg" class="border rounded p-1 w-24" />
+          </ng-template>
         </td>
 
         <td class="p-3 font-semibold text-blue-600">
           <ng-container *ngIf="!fila.editando; else edPeso">{{ fila.peso | number:'1.2-2' }}</ng-container>
-          <ng-template #edPeso><input type="number" [(ngModel)]="fila.peso" class="border rounded p-1 w-20" /></ng-template>
+          <ng-template #edPeso>
+            <input type="number" step="0.01" [(ngModel)]="fila.peso" class="border rounded p-1 w-24" />
+          </ng-template>
         </td>
 
         <td class="p-3">
@@ -120,12 +123,12 @@
         <td class="p-3 text-center">
           <div class="flex justify-center gap-2">
             <ng-container *ngIf="!fila.editando">
-              <button (click)="editar(fila)" class="text-yellow-500 hover:text-yellow-700 font-bold">✏️</button>
-              <button (click)="eliminar(fila)" class="text-red-500 hover:text-red-700 font-bold">🗑️</button>
+              <button (click)="editar(fila)" class="text-yellow-500 hover:text-yellow-700 font-bold" title="Editar">✏️</button>
+              <button (click)="eliminar(fila)" class="text-red-500 hover:text-red-700 font-bold" title="Eliminar">🗑️</button>
             </ng-container>
             <ng-container *ngIf="fila.editando">
-              <button (click)="guardar(fila)" class="text-green-600 hover:text-green-800 font-bold">💾</button>
-              <button (click)="cancelar(fila)" class="text-gray-500 hover:text-gray-700 font-bold">↩️</button>
+              <button (click)="guardar(fila)" class="text-green-600 hover:text-green-800 font-bold" title="Guardar">💾</button>
+              <button (click)="cancelar(fila)" class="text-gray-500 hover:text-gray-700 font-bold" title="Cancelar">↩️</button>
             </ng-container>
           </div>
         </td>

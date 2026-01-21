@@ -1,12 +1,13 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, RouterModule } from '@angular/router';
-import { RecetaService } from '../../services/recetas.service'; // Asegúrate de que la ruta sea correcta
+import { FormsModule } from '@angular/forms'; // 👈 IMPORTANTE: Para editar el porcentaje
+import { RecetaService } from '../../services/recetas.service';
 
 @Component({
   selector: 'app-ver-ficha',
   standalone: true,
-  imports: [CommonModule, RouterModule],
+  imports: [CommonModule, RouterModule, FormsModule], // 👈 Agregado aquí también
   templateUrl: './ver-ficha.component.html',
   styleUrls: ['./ver-ficha.component.css']
 })
@@ -17,14 +18,15 @@ export class VerFichaComponent implements OnInit {
   receta: any = null;
   cargando = true;
 
-  // Variables para cálculos financieros de Alta Cocina
+  // Variables para cálculos
   costoTotal = 0;
   costoPorcion = 0;
   precioVentaSugerido = 0;
-  foodCostPorcentaje = 30; // Estándar de la industria (30%)
+  
+  // Variable editable para el simulador
+  foodCostPorcentaje: number = 30; 
 
   ngOnInit() {
-    // Obtenemos el ID de la URL (ej: recetas/1 -> id=1)
     const id = this.route.snapshot.paramMap.get('id');
     if (id) {
       this.cargarReceta(Number(id));
@@ -32,11 +34,10 @@ export class VerFichaComponent implements OnInit {
   }
 
   cargarReceta(id: number) {
-    // Nota: Asumimos que tu servicio tiene un método findOne. Si no, avísame.
     this.recetasService.findOne(id).subscribe({
       next: (data) => {
         this.receta = data;
-        this.calcularCostos();
+        this.calcularCostos(); // Calcula costos y luego rentabilidad
         this.cargando = false;
       },
       error: (e) => {
@@ -46,28 +47,42 @@ export class VerFichaComponent implements OnInit {
     });
   }
 
+  // 1. CALCULA LOS COSTOS REALES (Materia Prima)
   calcularCostos() {
     if (!this.receta || !this.receta.recetasIngredientes) return;
 
-    // 1. Calcular Costo Total sumando ingrediente por ingrediente
     this.costoTotal = this.receta.recetasIngredientes.reduce((acc: number, item: any) => {
-      // Precio del ingrediente * Cantidad usada
-      const costoItem = (item.cantidad_usada * (item.ingrediente.precioKg || 0)); 
+      
+      // Lógica de Snapshot (Histórico vs Actual)
+      const precioUnitarioReal = Number(item.costo_historico) > 0 
+        ? Number(item.costo_historico) 
+        : Number(item.ingrediente?.precioKg || 0);
+
+      // Guardamos para mostrar en la tabla
+      item.precio_calculo_display = precioUnitarioReal; 
+
+      const costoItem = (Number(item.cantidad_usada) * precioUnitarioReal);
       return acc + costoItem;
     }, 0);
 
-    // 2. Costo por Porción (Costo Total / Número de Pax)
-    const pax = this.receta.num_porciones || 1;
+    // Costo por Porción
+    const pax = Number(this.receta.num_porciones) || 1;
     this.costoPorcion = this.costoTotal / pax;
 
-    // 3. Precio de Venta Sugerido (Basado en el 30% de Food Cost)
-    // Fórmula: Costo Porción / 0.30
-    if (this.foodCostPorcentaje > 0) {
+    // AL FINAL: Llamamos a la rentabilidad para calcular el precio de venta inicial
+    this.actualizarRentabilidad();
+  }
+
+  // 2. SIMULADOR DE RENTABILIDAD (Se llama al inicio y al editar el input)
+  actualizarRentabilidad() {
+    if (this.foodCostPorcentaje > 0 && this.costoPorcion > 0) {
+      // Fórmula: Costo Porción / (Porcentaje / 100)
       this.precioVentaSugerido = this.costoPorcion / (this.foodCostPorcentaje / 100);
+    } else {
+      this.precioVentaSugerido = 0;
     }
   }
   
-  // Función para imprimir la hoja
   imprimir() {
     window.print();
   }

@@ -53,26 +53,63 @@
         <h2 class="font-bold text-gray-700 mb-4 border-b pb-2">2. Composición (Ingredientes)</h2>
 
         <div class="bg-blue-50 p-4 rounded-lg mb-6 flex flex-wrap gap-4 items-end border border-blue-100">
-          <div class="flex-1 min-w-[200px]">
-            <label class="block text-xs font-bold text-blue-800 mb-1">Buscar Ingrediente</label>
-            <select [(ngModel)]="ingredienteSeleccionadoId" class="w-full border p-2 rounded">
-              <option [ngValue]="null">-- Seleccionar --</option>
-              <option *ngFor="let ing of listaIngredientes" [value]="ing.id">
-                {{ ing.nombre_ingrediente }} ($ {{ ing.precioKg }}/{{ ing.unidad_medida }})
-              </option>
-            </select>
+          
+          <div class="flex-1 min-w-[280px]">
+            <label class="block text-xs font-bold text-blue-800 mb-1">Buscar Ingrediente (Escribe para filtrar)</label>
+            <div class="flex">
+              <input 
+                type="text" 
+                list="listaIngredientesOpciones"
+                [(ngModel)]="nombreIngredienteBusqueda"
+                (change)="alSeleccionarIngrediente($event)"
+                class="w-full border border-gray-300 p-2 rounded-l focus:outline-none focus:ring-2 focus:ring-blue-500"
+                placeholder="Ej: Ajo, Pollo..."
+              >
+              
+              <button 
+                (click)="cargarIngredientesDisponibles()" 
+                class="bg-gray-100 text-gray-600 px-3 border-y border-gray-300 hover:bg-gray-200 transition"
+                title="Actualizar lista (Úsalo si creaste uno nuevo)">
+                🔄
+              </button>
+
+              <datalist id="listaIngredientesOpciones">
+                <option *ngFor="let ing of listaIngredientes" [value]="ing.nombre_ingrediente">
+                  $ {{ ing.precioKg }} / {{ ing.unidad_medida }}
+                </option>
+              </datalist>
+
+              <button 
+                (click)="irACrearIngrediente()"
+                class="bg-green-500 text-white px-3 py-2 rounded-r hover:bg-green-600 transition border border-green-600"
+                title="Crear Ingrediente Nuevo (Abre pestaña)">
+                +
+              </button>
+            </div>
           </div>
 
-          <div class="w-32">
+          <div class="w-40">
             <label class="block text-xs font-bold text-blue-800 mb-1">Cantidad</label>
-            <input [(ngModel)]="cantidadAgregar" type="number" class="w-full border p-2 rounded" placeholder="0.00">
+            <div class="flex items-center">
+              <input [(ngModel)]="cantidadAgregar" type="number" 
+                     class="w-full border border-gray-300 p-2 rounded-l focus:outline-none focus:ring-2 focus:ring-blue-500" 
+                     placeholder="0">
+              
+              <span class="bg-gray-200 border border-l-0 border-gray-300 text-gray-700 px-2 py-2 rounded-r font-bold text-sm min-w-[3rem] text-center h-[42px] flex items-center justify-center">
+                {{ unidadSeleccionada || '-' }}
+              </span>
+            </div>
           </div>
 
           <button (click)="agregarIngrediente()" 
-                  class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 font-bold shadow">
+                  class="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700 font-bold shadow h-[42px]">
             + Agregar
           </button>
         </div>
+        
+        <p class="text-xs text-gray-400 italic mb-4 text-right">
+          * Tip: Si creas un ingrediente nuevo, pulsa el botón 🔄 para actualizar la lista.
+        </p>
 
         <div class="overflow-x-auto">
           <table class="w-full text-sm text-left border-collapse">

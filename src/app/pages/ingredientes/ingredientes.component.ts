@@ -39,7 +39,17 @@ export class IngredientesComponent implements OnInit {
     this.cargar();
   }
 
-  // 👉 Cargar ingredientes desde el backend
+  // 👉 1. HELPER PARA LIMPIAR NÚMEROS (El secreto para evitar error 400)
+  // Convierte "2,5" en 2.5 y asegura que sea un número real
+  private limpiarNumero(valor: any): number {
+    if (!valor) return 0;
+    if (typeof valor === 'string') {
+      // Reemplaza coma por punto y convierte
+      return parseFloat(valor.replace(',', '.'));
+    }
+    return Number(valor);
+  }
+
   cargar() {
     this.srv.findAll().subscribe((data: Ingrediente[]) => {
       this.ingredientes = data;
@@ -47,9 +57,15 @@ export class IngredientesComponent implements OnInit {
     });
   }
 
-  // 👉 Agregar nuevo ingrediente
   agregar() {
-    this.srv.create(this.nueva).subscribe({
+    // Limpiamos antes de enviar
+    const datosLimpios = {
+      ...this.nueva,
+      precioKg: this.limpiarNumero(this.nueva.precioKg),
+      peso: this.limpiarNumero(this.nueva.peso)
+    };
+
+    this.srv.create(datosLimpios).subscribe({
       next: (ing: Ingrediente) => {
         this.ingredientes.push(ing);
         this.filtrarIngredientes();
@@ -65,36 +81,48 @@ export class IngredientesComponent implements OnInit {
     });
   }
 
-  // 👉 Editar ingrediente
   editar(f: FilaVisual) {
     f.backup = { ...f };
     f.editando = true;
   }
 
-  // 👉 Guardar cambios
+  // 👉 2. FUNCIÓN GUARDAR CORREGIDA (Aquí estaba el error)
   guardar(f: FilaVisual) {
-    const dto: any = { ...f }; // ✅ CORRECTO
-delete dto.editando;
-delete dto.backup;
+    
+    // A) CREAMOS UN OBJETO LIMPIO
+    // No usamos { ...f } porque copia el ID y deletedAt.
+    // Solo copiamos lo que el Backend permite editar.
+    const dtoLimpios = {
+      nombre_ingrediente: f.nombre_ingrediente,
+      unidad_medida: f.unidad_medida,
+      grupo: f.grupo,
+      // B) Aseguramos que los números sean correctos (sin comas)
+      precioKg: this.limpiarNumero(f.precioKg),
+      peso: this.limpiarNumero(f.peso)
+    };
 
-
-    this.srv.update(f.id!, dto).subscribe({
+    // C) ENVIAMOS SOLO LOS DATOS LIMPIOS
+    this.srv.update(f.id!, dtoLimpios).subscribe({
       next: (upd: Ingrediente) => {
-        Object.assign(f, upd);
+        Object.assign(f, upd); // Actualizamos la vista con la respuesta real
         f.editando = false;
         this.filtrarIngredientes();
+        alert('✅ Actualizado correctamente');
       },
-      error: () => alert('Error al actualizar ingrediente'),
+      error: (err) => {
+        console.error(err);
+        // Mostramos el mensaje exacto del servidor para entender qué pasa
+        const mensaje = err.error?.message || 'Error desconocido';
+        alert('❌ Error al actualizar: ' + (Array.isArray(mensaje) ? mensaje.join(', ') : mensaje));
+      },
     });
   }
 
-  // 👉 Cancelar edición
   cancelar(f: FilaVisual) {
     Object.assign(f, f.backup!);
     f.editando = false;
   }
 
-  // 👉 Eliminar ingrediente
   eliminar(f: FilaVisual) {
     if (!confirm(`¿Eliminar "${f.nombre_ingrediente}"?`)) return;
     this.srv.delete(f.id!).subscribe({
@@ -106,7 +134,6 @@ delete dto.backup;
     });
   }
 
-  // 👉 Filtrar lista en tiempo real
   filtrarIngredientes() {
     const texto = this.busqueda.toLowerCase();
     this.ingredientesFiltrados = this.ingredientes.filter((i) =>
@@ -115,17 +142,12 @@ delete dto.backup;
     );
   }
 
-  // 👉 Agregar grupo (solo visual o prueba)
   agregarGrupo() {
     if (!this.nuevoGrupo.nombre.trim()) {
       alert('El nombre del grupo es obligatorio');
       return;
     }
-
     console.log('Grupo agregado:', this.nuevoGrupo);
-    this.nuevoGrupo = {
-      nombre: '',
-      descripcion: ''
-    };
+    this.nuevoGrupo = { nombre: '', descripcion: '' };
   }
 }
