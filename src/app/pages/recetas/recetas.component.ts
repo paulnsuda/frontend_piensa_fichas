@@ -1,10 +1,8 @@
-// src/app/pages/recetas/recetas.component.ts
 import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
 
-// TUS SERVICIOS
 import { RecetaService } from '../../services/recetas.service';
 import { IngredienteService } from '../../services/ingredientes.service';
 
@@ -17,79 +15,71 @@ import { IngredienteService } from '../../services/ingredientes.service';
 })
 export class RecetasComponent implements OnInit {
   
-  // INYECCIÓN DE DEPENDENCIAS
   private recetaService = inject(RecetaService);
   private ingredienteService = inject(IngredienteService);
   private router = inject(Router);
 
-  // DATOS PARA EL SELECTOR (Buscador)
   listaIngredientes: any[] = [];
 
-  // VARIABLES TEMPORALES (Formulario pequeño de ingredientes)
   ingredienteSeleccionadoId: number | null = null;
   cantidadAgregar: number = 0;
 
-  // 👇 VARIABLES NUEVAS PARA MEJORAR LA UX
-  nombreIngredienteBusqueda: string = ''; // Lo que escribe el usuario en el buscador
-  unidadSeleccionada: string = '';        // Ej: 'Kg', 'L', 'Unidad' (se llena solo)
+  // Variables de UX
+  nombreIngredienteBusqueda: string = ''; 
+  unidadSeleccionada: string = '';        
+  costoRealUnitario: number = 0; 
 
-  // ==============================================================
-  // EL OBJETO PRINCIPAL (La Receta que vamos a crear)
-  // ==============================================================
+  // Objeto de la Receta (Con Rentabilidad y Precio Venta)
   nuevaReceta: any = {
     nombre_receta: '',
     tipo_plato: 'Plato Principal',
-    num_porciones: 4,           // Valor por defecto
+    num_porciones: 4,
     tamano_porcion: '',
     procedimiento: '',
+    
     costo_receta: 0,
-    recetasIngredientes: []     // Array en memoria
+    
+    // 👇 NUEVO: Valores por defecto para finanzas
+    rentabilidad: 30, // 30% es el estándar de la industria
+    precio_venta: 0,
+    
+    recetasIngredientes: []
   };
 
   ngOnInit(): void {
     this.cargarIngredientesDisponibles();
   }
 
-  // Cargar lista para el desplegable/buscador
   cargarIngredientesDisponibles(): void {
     this.ingredienteService.findAll().subscribe(data => {
       this.listaIngredientes = data;
     });
   }
 
-  // ==============================================================
-  // 🔽 NUEVAS FUNCIONES PARA EL BUSCADOR INTELIGENTE 🔽
-  // ==============================================================
-
-  // 1. Detecta qué ingrediente eligió el usuario de la lista escribible
+  // BUSCADOR INTELIGENTE
   alSeleccionarIngrediente(evento: any): void {
     const valorInput = evento.target.value;
-    
-    // Buscamos el ingrediente completo en la lista original por su nombre
     const encontrado = this.listaIngredientes.find(i => i.nombre_ingrediente === valorInput);
 
     if (encontrado) {
       this.ingredienteSeleccionadoId = encontrado.id;
-      this.unidadSeleccionada = encontrado.unidad_medida; // ¡Detectamos la unidad! (Kg, L, etc.)
+      this.unidadSeleccionada = encontrado.unidad_medida;
+      
+      // Detectamos el precio real (con merma)
+      this.costoRealUnitario = encontrado.precio_real || encontrado.precioKg;
     } else {
-      // Si escribió algo que no existe en la lista
       this.ingredienteSeleccionadoId = null;
       this.unidadSeleccionada = '';
+      this.costoRealUnitario = 0;
     }
   }
 
-  // 2. Botón para ir a crear un ingrediente nuevo rápidamente
   irACrearIngrediente(): void {
-    // Abre en nueva pestaña para no perder los datos de la receta actual
     window.open('/ingredientes', '_blank'); 
   }
 
-  // ==============================================================
-  // LÓGICA DE INGREDIENTES (EN MEMORIA)
-  // ==============================================================
-  
+  // AGREGAR A LA RECETA
   agregarIngrediente(): void {
-    // 1. Validaciones
     if (!this.ingredienteSeleccionadoId) {
       alert('Por favor, selecciona un ingrediente válido de la lista.');
       return;
@@ -99,28 +89,28 @@ export class RecetasComponent implements OnInit {
       return;
     }
 
-    // 2. Buscar datos completos del ingrediente seleccionado
     const ingEncontrado = this.listaIngredientes.find(i => i.id == this.ingredienteSeleccionadoId);
 
     if (ingEncontrado) {
-      // 3. Agregamos al array visual
+      const precioAUsar = ingEncontrado.precio_real || ingEncontrado.precioKg;
+
       this.nuevaReceta.recetasIngredientes.push({
         id_ingrediente: ingEncontrado.id,
-        nombre: ingEncontrado.nombre_ingrediente, // Para mostrar en tabla
-        unidad: ingEncontrado.unidad_medida,      // Para mostrar en tabla
-        precio: ingEncontrado.precioKg,           // Para calcular costos actuales
+        nombre: ingEncontrado.nombre_ingrediente, 
+        unidad: ingEncontrado.unidad_medida,      
+        precio: precioAUsar,           
         cantidad_usada: this.cantidadAgregar,
-        subtotal: (this.cantidadAgregar * ingEncontrado.precioKg)
+        subtotal: (this.cantidadAgregar * precioAUsar)
       });
 
-      // 4. Actualizamos el costo total
       this.calcularTotal();
 
-      // 5. LIMPIEZA COMPLETA
+      // Limpieza del formulario de ingrediente
       this.ingredienteSeleccionadoId = null;
       this.cantidadAgregar = 0;
-      this.nombreIngredienteBusqueda = ''; // Limpiamos el buscador visual
-      this.unidadSeleccionada = '';        // Limpiamos la unidad visual
+      this.nombreIngredienteBusqueda = ''; 
+      this.unidadSeleccionada = '';       
+      this.costoRealUnitario = 0;
     }
   }
 
@@ -129,15 +119,25 @@ export class RecetasComponent implements OnInit {
     this.calcularTotal();
   }
 
+  // 👇 LÓGICA FINANCIERA ACTUALIZADA
   calcularTotal(): void {
+    // 1. Sumar el costo de producción (Ingredientes)
     this.nuevaReceta.costo_receta = this.nuevaReceta.recetasIngredientes.reduce(
       (acc: number, item: any) => acc + item.subtotal, 0
     );
+
+    // 2. Calcular Precio de Venta en base a la Rentabilidad
+    // Fórmula Gastronómica: Precio = Costo / (1 - %Rentabilidad)
+    const margen = this.nuevaReceta.rentabilidad || 0;
+    
+    if (margen >= 100) {
+      this.nuevaReceta.precio_venta = 0; // Evitar división por cero o márgenes imposibles
+    } else {
+      const factor = 1 - (margen / 100);
+      this.nuevaReceta.precio_venta = this.nuevaReceta.costo_receta / factor;
+    }
   }
 
-  // ==============================================================
-  // GUARDAR TODO EN BASE DE DATOS (CON PRECIO HISTÓRICO ✅)
-  // ==============================================================
   guardarReceta(): void {
     if (!this.nuevaReceta.nombre_receta) {
       alert('El nombre de la receta es obligatorio.');
@@ -148,7 +148,6 @@ export class RecetasComponent implements OnInit {
       return;
     }
 
-    // 2. LIMPIEZA DE DATOS (Mapeo para el Backend)
     const datosParaBackend = {
       nombre_receta: this.nuevaReceta.nombre_receta,
       tipo_plato: this.nuevaReceta.tipo_plato,
@@ -157,17 +156,18 @@ export class RecetasComponent implements OnInit {
       procedimiento: this.nuevaReceta.procedimiento,
       costo_receta: Number(this.nuevaReceta.costo_receta),
       
-      // Enviamos el objeto ingrediente como le gusta a TypeORM
+      // 👇 ENVIAMOS LOS DATOS FINANCIEROS
+      rentabilidad: Number(this.nuevaReceta.rentabilidad),
+      precio_venta: Number(this.nuevaReceta.precio_venta),
+
       recetasIngredientes: this.nuevaReceta.recetasIngredientes.map((item: any) => ({
         cantidad_usada: Number(item.cantidad_usada),
         ingrediente: { id: Number(item.id_ingrediente) },
-        
-        // 👇 ESTO ES LO NUEVO: Guardamos el precio del momento (Snapshot)
         costo_historico: Number(item.precio) 
       }))
     };
 
-    console.log('Enviando datos limpios:', datosParaBackend);
+    console.log('Guardando Ficha Técnica Completa:', datosParaBackend);
 
     this.recetaService.create(datosParaBackend).subscribe({
       next: (res) => {

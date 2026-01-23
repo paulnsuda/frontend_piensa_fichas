@@ -1,42 +1,46 @@
-// src/app/services/ingrediente.service.ts
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { environment } from '../../environments/environment';   // 👈 importa environment
+import { environment } from '../../environments/environment';
 
 export interface Ingrediente {
   id?: number;
   nombre_ingrediente: string;
   unidad_medida: string;
-  precioKg: number;
-  peso: number;
-  pesoKg: number;
-  grupo: string;
-  id_compra?: number;
+  
+  // 👇 CAMPOS NUEVOS QUE FALTABAN
+  peso: number;           // Cantidad comprada
+  pesoKg?: number;        // Stock calculado (El que daba error)
+  peso_unitario?: number; // Peso de la unidad
+  precioKg: number;       // Precio de compra
+  
+  rendimiento?: number;   // Merma
+  precio_real?: number;   // Calculado
+  
+  grupo?: string;
+  deletedAt?: Date;
 }
 
 @Injectable({ providedIn: 'root' })
 export class IngredienteService {
-
-  /* URL base dinámica (dev → localhost, prod → Render) */
-  private api = `${environment.apiUrl}/ingredientes`;
+  // Asegúrate de que apunte a 'ingredientes' (plural)
+  private apiUrl = `${environment.apiUrl}/ingredientes`;
 
   constructor(private http: HttpClient) {}
 
-  /* === CRUD === */
   findAll(): Observable<Ingrediente[]> {
-    return this.http.get<Ingrediente[]>(this.api);
+    return this.http.get<Ingrediente[]>(this.apiUrl);
   }
 
-  create(dto: Partial<Ingrediente>): Observable<Ingrediente> {
-    return this.http.post<Ingrediente>(this.api, dto);
+  create(data: any): Observable<Ingrediente> {
+    return this.http.post<Ingrediente>(this.apiUrl, data);
   }
 
-  update(id: number, dto: Partial<Ingrediente>): Observable<Ingrediente> {
-    return this.http.put<Ingrediente>(`${this.api}/${id}`, dto);
+  update(id: number, data: any): Observable<Ingrediente> {
+    return this.http.patch<Ingrediente>(`${this.apiUrl}/${id}`, data);
   }
 
-  delete(id: number): Observable<void> {
-    return this.http.delete<void>(`${this.api}/${id}`);
+  delete(id: number): Observable<any> {
+    return this.http.delete(`${this.apiUrl}/${id}`);
   }
 }

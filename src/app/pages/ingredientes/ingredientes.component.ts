@@ -22,10 +22,12 @@ export class IngredientesComponent implements OnInit {
 
   nueva: Partial<Ingrediente> = {
     nombre_ingrediente: '',
-    unidad_medida: 'g',
+    unidad_medida: 'kg',
     precioKg: 0,
     peso: 0,
     grupo: '',
+    rendimiento: 100,
+    peso_unitario: 1
   };
 
   nuevoGrupo = {
@@ -39,15 +41,19 @@ export class IngredientesComponent implements OnInit {
     this.cargar();
   }
 
-  // 👉 1. HELPER PARA LIMPIAR NÚMEROS (El secreto para evitar error 400)
-  // Convierte "2,5" en 2.5 y asegura que sea un número real
   private limpiarNumero(valor: any): number {
-    if (!valor) return 0;
+    if (!valor && valor !== 0) return 0;
     if (typeof valor === 'string') {
-      // Reemplaza coma por punto y convierte
       return parseFloat(valor.replace(',', '.'));
     }
     return Number(valor);
+  }
+
+  calcularPrecioRealPreview(): number {
+    const precio = this.limpiarNumero(this.nueva.precioKg);
+    const rendimiento = this.limpiarNumero(this.nueva.rendimiento);
+    if (rendimiento <= 0) return 0;
+    return precio / (rendimiento / 100);
   }
 
   cargar() {
@@ -58,11 +64,17 @@ export class IngredientesComponent implements OnInit {
   }
 
   agregar() {
-    // Limpiamos antes de enviar
+    if (!this.nueva.nombre_ingrediente) {
+      alert('El nombre es obligatorio');
+      return;
+    }
+
     const datosLimpios = {
       ...this.nueva,
       precioKg: this.limpiarNumero(this.nueva.precioKg),
-      peso: this.limpiarNumero(this.nueva.peso)
+      peso: this.limpiarNumero(this.nueva.peso),
+      rendimiento: this.limpiarNumero(this.nueva.rendimiento) || 100,
+      peso_unitario: this.limpiarNumero(this.nueva.peso_unitario) || 1
     };
 
     this.srv.create(datosLimpios).subscribe({
@@ -71,13 +83,18 @@ export class IngredientesComponent implements OnInit {
         this.filtrarIngredientes();
         this.nueva = {
           nombre_ingrediente: '',
-          unidad_medida: 'g',
+          unidad_medida: 'kg',
           precioKg: 0,
           peso: 0,
           grupo: '',
+          rendimiento: 100,
+          peso_unitario: 1
         };
       },
-      error: () => alert('Error al agregar ingrediente'),
+      error: (err) => {
+        console.error(err);
+        alert('Error al agregar ingrediente');
+      },
     });
   }
 
@@ -86,46 +103,43 @@ export class IngredientesComponent implements OnInit {
     f.editando = true;
   }
 
-  // 👉 2. FUNCIÓN GUARDAR CORREGIDA (Aquí estaba el error)
   guardar(f: FilaVisual) {
-    
-    // A) CREAMOS UN OBJETO LIMPIO
-    // No usamos { ...f } porque copia el ID y deletedAt.
-    // Solo copiamos lo que el Backend permite editar.
     const dtoLimpios = {
       nombre_ingrediente: f.nombre_ingrediente,
       unidad_medida: f.unidad_medida,
       grupo: f.grupo,
-      // B) Aseguramos que los números sean correctos (sin comas)
       precioKg: this.limpiarNumero(f.precioKg),
-      peso: this.limpiarNumero(f.peso)
+      peso: this.limpiarNumero(f.peso),
+      rendimiento: this.limpiarNumero(f.rendimiento),
+      peso_unitario: this.limpiarNumero(f.peso_unitario)
     };
 
-    // C) ENVIAMOS SOLO LOS DATOS LIMPIOS
-    this.srv.update(f.id!, dtoLimpios).subscribe({
+    // Usamos f.id! con el signo de exclamación para asegurar que existe
+    if (!f.id) return; 
+
+    this.srv.update(f.id, dtoLimpios).subscribe({
       next: (upd: Ingrediente) => {
-        Object.assign(f, upd); // Actualizamos la vista con la respuesta real
+        Object.assign(f, upd);
         f.editando = false;
         this.filtrarIngredientes();
-        alert('✅ Actualizado correctamente');
+        alert('✅ Ingrediente actualizado');
       },
       error: (err) => {
-        console.error(err);
-        // Mostramos el mensaje exacto del servidor para entender qué pasa
         const mensaje = err.error?.message || 'Error desconocido';
-        alert('❌ Error al actualizar: ' + (Array.isArray(mensaje) ? mensaje.join(', ') : mensaje));
+        alert('❌ Error: ' + (Array.isArray(mensaje) ? mensaje.join(', ') : mensaje));
       },
     });
   }
 
   cancelar(f: FilaVisual) {
-    Object.assign(f, f.backup!);
+    if (f.backup) Object.assign(f, f.backup);
     f.editando = false;
   }
 
   eliminar(f: FilaVisual) {
-    if (!confirm(`¿Eliminar "${f.nombre_ingrediente}"?`)) return;
-    this.srv.delete(f.id!).subscribe({
+    if (!f.id || !confirm(`¿Eliminar "${f.nombre_ingrediente}"?`)) return;
+
+    this.srv.delete(f.id).subscribe({
       next: () => {
         this.ingredientes = this.ingredientes.filter((i) => i.id !== f.id);
         this.filtrarIngredientes();
@@ -134,12 +148,17 @@ export class IngredientesComponent implements OnInit {
     });
   }
 
+  // 🔴 CORRECCIÓN CLAVE AQUÍ PARA EL ERROR DE "undefined"
   filtrarIngredientes() {
-    const texto = this.busqueda.toLowerCase();
-    this.ingredientesFiltrados = this.ingredientes.filter((i) =>
-      i.nombre_ingrediente.toLowerCase().includes(texto) ||
-      i.grupo.toLowerCase().includes(texto)
-    );
+    const texto = (this.busqueda || '').toLowerCase(); // Protegemos this.busqueda
+    
+    this.ingredientesFiltrados = this.ingredientes.filter((i) => {
+      // Protegemos i.nombre_ingrediente y i.grupo con || ''
+      const nombre = (i.nombre_ingrediente || '').toLowerCase();
+      const grupo = (i.grupo || '').toLowerCase();
+      
+      return nombre.includes(texto) || grupo.includes(texto);
+    });
   }
 
   agregarGrupo() {

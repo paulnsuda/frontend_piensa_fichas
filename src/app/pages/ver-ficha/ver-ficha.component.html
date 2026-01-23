@@ -1,131 +1,144 @@
-<div class="max-w-5xl mx-auto p-8 bg-white min-h-screen print:p-0" *ngIf="receta; else loading">
-  
-  <div class="mb-6 flex justify-between items-center print:hidden">
-    <a routerLink="/listar-recetas" class="text-gray-500 hover:text-gray-700 flex items-center gap-2">
-      ⬅ Volver al listado
-    </a>
-    <button (click)="imprimir()" class="bg-gray-800 text-white px-4 py-2 rounded-lg shadow hover:bg-black transition">
-      🖨️ Imprimir Ficha
-    </button>
-  </div>
+<div class="container mx-auto p-4 max-w-5xl" *ngIf="receta">
 
-  <div class="border-b-2 border-gray-800 pb-4 mb-8">
-    <div class="flex justify-between items-end">
-      <div>
-        <span class="text-xs font-bold text-gray-400 uppercase tracking-wider">Ficha Técnica Estándar</span>
-        <h1 class="text-4xl font-black text-gray-900 mt-1">{{ receta.nombreReceta }}</h1>
-        <span class="inline-block bg-gray-100 text-gray-600 px-2 py-1 rounded text-xs font-bold mt-2 uppercase">
-          {{ receta.tipoPlato }}
-        </span>
-      </div>
-      <div class="text-right flex gap-4">
-        <div class="bg-gray-50 px-4 py-2 rounded border">
-          <span class="block text-xs text-gray-500 font-bold uppercase">Porciones</span>
-          <span class="block text-xl font-bold text-gray-800">{{ receta.numPorciones }}</span>
-        </div>
-        <div class="bg-gray-50 px-4 py-2 rounded border">
-          <span class="block text-xs text-gray-500 font-bold uppercase">Tamaño</span>
-          <span class="block text-xl font-bold text-gray-800">{{ receta.tamanoPorcion }}</span>
-        </div>
-      </div>
+  <div class="flex flex-col md:flex-row justify-between items-center mb-6 gap-4 animate-fade-in">
+    <div>
+      <h1 class="text-3xl font-bold text-gray-800">{{ receta.nombreReceta || receta.nombre_receta }}</h1>
+      <span class="px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wide bg-blue-100 text-blue-800 border border-blue-200">
+        {{ receta.tipoPlato || receta.tipo_plato }}
+      </span>
+    </div>
+    <div class="flex gap-3">
+      <button (click)="imprimir()" class="bg-gray-800 hover:bg-gray-700 text-white px-4 py-2 rounded-lg shadow flex items-center gap-2 transition">
+        🖨️ Imprimir
+      </button>
+      <button routerLink="/listar-recetas" class="bg-white border border-gray-300 text-gray-700 hover:bg-gray-50 px-4 py-2 rounded-lg shadow flex items-center gap-2 transition">
+        ↩ Volver
+      </button>
     </div>
   </div>
 
-  <div class="mb-8">
-    <h3 class="font-bold text-gray-700 mb-3 flex items-center gap-2">
-      🧂 Desglose de Ingredientes
-    </h3>
-    <table class="w-full text-sm border-collapse">
-      <thead class="bg-gray-100 text-gray-600 uppercase text-xs tracking-wider">
-        <tr>
-          <th class="px-4 py-3 text-left rounded-l-lg">Ingrediente</th>
-          <th class="px-4 py-3 text-right">Cantidad</th>
-          <th class="px-4 py-3 text-center">Unidad</th>
-          <th class="px-4 py-3 text-right">Costo Unit.</th>
-          <th class="px-4 py-3 text-right rounded-r-lg">Subtotal</th>
-        </tr>
-      </thead>
-      <tbody class="divide-y divide-gray-100">
-        <tr *ngFor="let item of receta.recetasIngredientes">
-          <td class="px-4 py-3 font-medium text-gray-800">
-            {{ item.ingrediente?.nombre_ingrediente || 'Ingrediente Borrado' }}
-          </td>
-          <td class="px-4 py-3 text-right">{{ item.cantidad_usada }}</td>
-          <td class="px-4 py-3 text-center text-gray-500 text-xs">
-            {{ item.ingrediente?.unidad_medida }}
-          </td>
-          
-          <td class="px-4 py-3 text-right text-gray-600">
-            $ {{ item.precio_calculo_display | number:'1.2-2' }}
-          </td>
-          
-          <td class="px-4 py-3 text-right font-bold text-gray-800">
-            $ {{ (item.cantidad_usada * item.precio_calculo_display) | number:'1.2-2' }}
-          </td>
-        </tr>
-      </tbody>
-      <tfoot class="bg-gray-50 border-t border-gray-200">
-        <tr>
-          <td colspan="4" class="px-4 py-4 text-right font-bold text-gray-600 text-xs uppercase">
-            Costo Total Materia Prima:
-          </td>
-          <td class="px-4 py-4 text-right font-black text-xl text-gray-900">
-            $ {{ costoTotal | number:'1.2-2' }}
-          </td>
-        </tr>
-      </tfoot>
-    </table>
-  </div>
-
-  <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
     
-    <div class="md:col-span-2">
-      <h3 class="font-bold text-gray-700 mb-3 flex items-center gap-2">
-        🔥 Procedimiento
-      </h3>
-      <div class="bg-gray-50 p-6 rounded-lg text-gray-700 leading-relaxed text-justify border border-gray-100 whitespace-pre-line">
-        {{ receta.procedimiento || 'Sin procedimiento registrado.' }}
-      </div>
-    </div>
-
-    <div class="md:col-span-1">
-      <div class="bg-blue-50 rounded-xl p-6 border border-blue-100 shadow-sm">
-        <h4 class="text-blue-800 font-bold text-xs uppercase tracking-widest mb-4 border-b border-blue-200 pb-2">
-          Rentabilidad
-        </h4>
-
-        <div class="flex justify-between items-center mb-3">
-          <span class="text-sm text-blue-600 font-medium">Costo Porción</span>
-          <span class="text-xl font-bold text-gray-800">$ {{ costoPorcion | number:'1.2-2' }}</span>
-        </div>
-
-        <div class="flex justify-between items-center mb-6">
-  <span class="text-sm text-blue-600 font-medium">Food Cost Objetivo (%)</span>
-  <div class="flex items-center bg-white rounded border border-blue-200 w-20">
-    <input 
-      type="number" 
-      [(ngModel)]="foodCostPorcentaje" 
-      (ngModelChange)="actualizarRentabilidad()"
-      class="w-full text-center text-blue-800 font-bold text-sm py-1 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-      min="1" max="100">
-  </div>
-        </div>
-
-        <div class="pt-4 border-t border-blue-200">
-          <span class="block text-xs text-center text-blue-500 mb-1 uppercase">Precio Venta Sugerido</span>
-          <div class="text-center text-3xl font-black text-green-600 bg-white py-3 rounded-lg border border-blue-100 shadow-sm">
-            $ {{ precioVentaSugerido | number:'1.2-2' }}
+    <div class="lg:col-span-1 space-y-6">
+      
+      <div class="bg-white p-6 rounded-xl shadow-lg border-t-4 border-green-500">
+        <h3 class="text-gray-500 text-xs font-bold uppercase tracking-wider mb-4">Análisis Financiero</h3>
+        
+        <div class="grid grid-cols-2 gap-4 mb-4">
+          <div>
+            <p class="text-xs text-gray-400 uppercase">Costo Total</p>
+            <p class="text-xl font-bold text-gray-700">
+              $ {{ (receta.costoReceta || receta.costo_receta) | number:'1.2-2' }}
+            </p>
+          </div>
+          <div>
+            <p class="text-xs text-gray-400 uppercase">Rentabilidad</p>
+            <p class="text-xl font-bold text-blue-600">{{ receta.rentabilidad }}%</p>
           </div>
         </div>
+
+        <div class="bg-green-50 p-3 rounded-lg border border-green-100 text-center">
+          <p class="text-xs text-green-800 uppercase font-bold">Precio de Venta Sugerido</p>
+          <p class="text-3xl font-extrabold text-green-700 mt-1">
+            $ {{ (receta.precioVenta || receta.precio_venta) | number:'1.2-2' }}
+          </p>
+        </div>
+
+        <div class="mt-4 pt-4 border-t border-dashed border-gray-200 flex justify-between text-sm">
+          <span class="text-gray-600">Precio Carta (Porción):</span>
+          <span class="font-bold text-gray-800">
+            $ {{ ((receta.precioVenta || receta.precio_venta) / (receta.numPorciones || receta.num_porciones || 1)) | number:'1.2-2' }}
+          </span>
+        </div>
+      </div>
+
+      <div class="bg-white p-6 rounded-xl shadow border border-gray-100">
+        <h3 class="text-gray-800 font-bold mb-4 border-b pb-2">Detalles</h3>
+        <ul class="space-y-3 text-sm">
+          <li>
+            <span class="block text-gray-500 text-xs">Tamaño de Porción</span>
+            <span class="font-medium">{{ receta.tamanoPorcion || receta.tamano_porcion || 'No especificado' }}</span>
+          </li>
+          <li>
+            <span class="block text-gray-500 text-xs">Porciones</span>
+            <span class="font-medium">{{ receta.numPorciones || receta.num_porciones }}</span>
+          </li>
+          <li>
+            <span class="block text-gray-500 text-xs">Fecha de Creación</span>
+            <span class="font-medium">{{ (receta.fechaCreacion || receta.fecha_creacion) | date:'mediumDate' }}</span>
+          </li>
+          <li>
+            <span class="block text-gray-500 text-xs">Chef / Usuario</span>
+            <span class="font-medium">{{ receta.usuario?.nombre || 'Admin' }}</span>
+          </li>
+        </ul>
       </div>
     </div>
 
-  </div>
+    <div class="lg:col-span-2 space-y-8">
+      
+      <div class="bg-white p-6 rounded-xl shadow border border-gray-100">
+        <h2 class="text-xl font-bold text-gray-800 mb-4">Procedimiento</h2>
+        <div class="prose max-w-none text-gray-600 whitespace-pre-line">
+          {{ receta.procedimiento || 'Sin procedimiento registrado.' }}
+        </div>
+      </div>
 
+      <div class="bg-white rounded-xl shadow overflow-hidden border border-gray-100">
+        <div class="p-4 bg-gray-50 border-b border-gray-200">
+          <h2 class="text-lg font-bold text-gray-800">Estructura de Costos</h2>
+        </div>
+        
+        <table class="w-full text-left">
+          <thead class="bg-gray-100 text-xs text-gray-500 uppercase">
+            <tr>
+              <th class="p-4">Ingrediente</th>
+              <th class="p-4 text-center">Cant.</th>
+              <th class="p-4 text-center">Unidad</th>
+              <th class="p-4 text-right">Costo Real/U</th>
+              <th class="p-4 text-right">Subtotal</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-gray-100 text-sm">
+            <tr *ngFor="let item of receta.recetasIngredientes" class="hover:bg-gray-50 transition">
+              
+              <td class="p-4 font-medium text-gray-700">
+                {{ item.ingrediente?.nombre_ingrediente || item.ingrediente?.nombreIngrediente }}
+              </td>
+              
+              <td class="p-4 text-center font-bold">
+                {{ item.cantidadUsada || item.cantidad_usada }}
+              </td>
+
+              <td class="p-4 text-center text-gray-500">
+                {{ item.ingrediente?.unidad_medida || item.ingrediente?.unidadMedida }}
+              </td>
+
+              <td class="p-4 text-right text-gray-500">
+                $ {{ (item.costoHistorico || item.costo_historico) | number:'1.2-2' }}
+              </td>
+
+              <td class="p-4 text-right font-bold text-gray-800">
+                $ {{ ((item.cantidadUsada || item.cantidad_usada) * (item.costoHistorico || item.costo_historico)) | number:'1.2-2' }}
+              </td>
+
+            </tr>
+          </tbody>
+          <tfoot class="bg-gray-50">
+            <tr>
+              <td colspan="4" class="p-4 text-right font-bold text-gray-600 uppercase">Costo Total Producción</td>
+              <td class="p-4 text-right font-extrabold text-blue-600 text-lg">
+                $ {{ (receta.costoReceta || receta.costo_receta) | number:'1.2-2' }}
+              </td>
+            </tr>
+          </tfoot>
+        </table>
+      </div>
+
+    </div>
+  </div>
 </div>
 
-<ng-template #loading>
-  <div class="flex justify-center items-center h-screen">
-    <div class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
-  </div>
-</ng-template>
+<div *ngIf="!receta" class="text-center py-20">
+  <p class="text-gray-500 animate-pulse">Cargando ficha técnica...</p>
+</div>
