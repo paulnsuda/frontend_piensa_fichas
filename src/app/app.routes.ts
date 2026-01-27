@@ -41,19 +41,30 @@ export const routes: Routes = [
         loadComponent: () => import('./pages/ingredientes/ingredientes.component').then(m => m.IngredientesComponent),
         title: 'Ingredientes'
       },
-      // 1. Crear Receta (Formulario)
+      
+      // 1. Crear Receta (Formulario Nuevo)
       {
         path: 'recetas',
         loadComponent: () => import('./pages/recetas/recetas.component').then(m => m.RecetasComponent),
         title: 'Crear Receta'
       },
-      // 2. VER FICHA TÉCNICA (El cambio importante está aquí 👇)
+
+      // 👇 2. EDITAR RECETA (Ruta Nueva)
+      // Reutilizamos el mismo componente RecetasComponent
       {
-        path: 'recetas/:id',
+        path: 'recetas/editar/:id',
+        loadComponent: () => import('./pages/recetas/recetas.component').then(m => m.RecetasComponent),
+        title: 'Editar Receta'
+      },
+
+      // 3. VER FICHA TÉCNICA
+      {
+        path: 'ver-ficha/:id', // Nota: Tu código anterior decía 'recetas/:id', pero en ver-ficha.component.ts usas routerLink a 'ver-ficha'. Lo he estandarizado a 'ver-ficha' para evitar conflictos.
         loadComponent: () => import('./pages/ver-ficha/ver-ficha.component').then(m => m.VerFichaComponent),
         title: 'Ficha Técnica de Alta Cocina'
       },
-      // 3. Listar Recetas (El Menú)
+      
+      // 4. Listar Recetas (El Menú)
       {
         path: 'listar-recetas',
         loadComponent: () => import('./pages/listar/listar-recetas.component').then(m => m.ListarRecetasComponent),

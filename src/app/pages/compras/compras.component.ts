@@ -1,18 +1,22 @@
 import { Component, OnInit, inject } from '@angular/core';
-import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
+import { FormBuilder, FormGroup, Validators, ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
+// Servicios
 import { CompraService } from '../../services/compra.service';
 import { ProveedorService } from '../../services/proveedor.service';
-import { IngredienteService } from '../../services/ingredientes.service'; // 👈 OJO: Nombre exacto de tu clase
+import { IngredienteService } from '../../services/ingredientes.service';
+import { RecetaService } from '../../services/recetas.service'; // 👈 NUEVO: Importante para la calculadora
 
 @Component({
   selector: 'app-compras',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule, FormsModule], // 👈 Agregamos FormsModule para la calculadora
   templateUrl: './compras.component.html',
   styleUrls: ['./compras.component.css']
 })
 export class ComprasComponent implements OnInit {
+  
+  // --- VARIABLES DE LA PESTAÑA "REGISTRO" (LO QUE YA TENÍAS) ---
   form!: FormGroup;
   proveedores: any[] = [];
   ingredientes: any[] = [];
@@ -20,12 +24,22 @@ export class ComprasComponent implements OnInit {
   mensaje: string = '';
   cargando = false;
 
+  // --- VARIABLES DE LA PESTAÑA "CALCULADORA" (LO NUEVO) ---
+  vistaActual: 'registro' | 'calculadora' = 'registro'; // Controla qué pestaña se ve
+  listaRecetas: any[] = [];
+  recetaSeleccionadaId: number | null = null;
+  cantidadPlatosAProducir: number = 0;
+  listaNecesidades: any[] = [];
+
+  // --- INYECCIÓN DE DEPENDENCIAS ---
   private fb = inject(FormBuilder);
   private compraService = inject(CompraService);
   private proveedorService = inject(ProveedorService);
-  private ingredienteService = inject(IngredienteService); // 👈 Inyección corregida
+  private ingredienteService = inject(IngredienteService);
+  private recetaService = inject(RecetaService); // 👈 Inyectamos el servicio
 
   ngOnInit(): void {
+    // Configuración del Formulario de Compra (Stock)
     this.form = this.fb.group({
       descripcion: ['', Validators.required],
       proveedorId: ['', Validators.required],
@@ -42,7 +56,10 @@ export class ComprasComponent implements OnInit {
     this.cargarProveedores();
     this.cargarIngredientes();
     this.cargarCompras();
+    this.cargarRecetas(); // 👈 Cargamos las recetas para la calculadora
   }
+
+  // --- MÉTODOS DE CARGA DE DATOS ---
 
   cargarProveedores() {
     this.proveedorService.getProveedores().subscribe({
@@ -51,9 +68,8 @@ export class ComprasComponent implements OnInit {
     });
   }
 
-  // 👇 AQUÍ ESTABA EL ERROR
   cargarIngredientes() {
-    this.ingredienteService.findAll().subscribe({ // 👈 Cambiamos listar() por findAll()
+    this.ingredienteService.findAll().subscribe({
       next: (data) => this.ingredientes = data,
       error: (e) => console.error('Error cargando ingredientes', e)
     });
@@ -66,6 +82,49 @@ export class ComprasComponent implements OnInit {
     });
   }
 
+  cargarRecetas() {
+    this.recetaService.findAll().subscribe({
+      next: (data) => this.listaRecetas = data,
+      error: (e) => console.error('Error cargando recetas', e)
+    });
+  }
+
+  // --- LÓGICA DE LA CALCULADORA (OPCIÓN B) ---
+
+  calcularCompras() {
+    if (!this.recetaSeleccionadaId || this.cantidadPlatosAProducir <= 0) {
+      alert('Por favor selecciona una receta y una cantidad válida.');
+      return;
+    }
+
+    // Buscamos la receta completa con sus ingredientes
+    // Nota: Usamos findOne para asegurar que traemos el detalle de ingredientes si findAll es ligero
+    this.recetaService.findOne(this.recetaSeleccionadaId).subscribe({
+      next: (recetaFull) => {
+        
+        const porcionesBase = recetaFull.numPorciones || 1;
+        // Factor multiplicador: (Quiero 100 / La receta es para 1) = 100
+        const factor = this.cantidadPlatosAProducir / porcionesBase;
+
+        // Hacemos la magia matemática
+        this.listaNecesidades = recetaFull.recetasIngredientes.map((ri: any) => {
+          // Calculamos cuánto necesitamos para todo el evento
+          const cantidadTotalRequerida = ri.cantidad_usada * factor;
+          
+          return {
+            ingrediente: ri.ingrediente.nombre_ingrediente,
+            unidad: ri.ingrediente.unidad_medida,
+            cantidad_unitaria: ri.cantidad_usada, // Lo que usa 1 plato
+            cantidad_total: cantidadTotalRequerida // Lo que usa el evento
+          };
+        });
+      },
+      error: (e) => alert('Error al calcular: ' + e.message)
+    });
+  }
+
+  // --- LÓGICA DE REGISTRO DE COMPRAS (TU CÓDIGO ANTERIOR) ---
+
   guardar() {
     if (this.form.invalid) {
       this.form.markAllAsTouched();
@@ -77,23 +136,17 @@ export class ComprasComponent implements OnInit {
     
     const formValue = this.form.getRawValue();
 
-    // 👇 CONVERSIÓN EXPLÍCITA: Forzamos a que todo sea número real
     const datosBackend = {
       nombre_presentacion: formValue.descripcion,
-      
-      // Convertimos a Número (si es null o texto, pone 0)
       id_proveedor: Number(formValue.proveedorId),
       id_ingrediente: Number(formValue.id_ingrediente),
       peso_kg: Number(formValue.peso_kg),
       costo_final: Number(formValue.costo_total),
-      
-      // Valores por defecto
-      precio_compra: Number(formValue.costo_total), // Asumimos precio total por ahora
+      precio_compra: Number(formValue.costo_total), 
       unidad_compra: 'kg',
-      fecha_compra: formValue.fecha_compra // Esto ahora sí lo acepta el DTO
+      fecha_compra: formValue.fecha_compra 
     };
 
-    // Imprimimos en consola qué estamos enviando (Para que tú lo veas)
     console.log('Enviando datos:', datosBackend);
 
     this.compraService.crearCompra(datosBackend).subscribe({
@@ -108,23 +161,21 @@ export class ComprasComponent implements OnInit {
           proveedorId: ''
         });
         this.cargarCompras();
-        this.cargarIngredientes(); // Actualizar stock visualmente
+        this.cargarIngredientes(); 
       },
-      // 👇 MEJORA EN EL REPORTE DE ERRORES
       error: (err) => {
         this.cargando = false;
         console.error('Error detallado:', err);
-        
-        // Intentamos mostrar el mensaje exacto que manda el backend
         const msg = err.error?.message;
         if (Array.isArray(msg)) {
-          this.mensaje = 'Error: ' + msg.join(', '); // Ej: "peso_kg must be a number"
+          this.mensaje = 'Error: ' + msg.join(', ');
         } else {
           this.mensaje = 'Error al registrar: Verifique los campos.';
         }
       }
     });
   }
+
   eliminarCompra(id: number) {
     if (!confirm('¿Estás seguro de eliminar esta compra?')) return;
     this.compraService.eliminarCompra(id).subscribe({

@@ -1,130 +1,202 @@
-<div class="max-w-6xl mx-auto p-4 md:p-6">
-  
-  <h1 class="text-3xl font-bold text-gray-800 mb-8 text-center md:text-left">🛒 Gestión de Compras</h1>
+<div class="w-full min-h-screen bg-slate-50 p-6 box-border">
 
-  <div class="bg-white rounded-lg shadow-lg p-6 mb-8 border border-gray-100">
-    <h2 class="text-xl font-semibold text-gray-700 mb-6 flex items-center gap-2">
-      <span>➕</span> Registrar Nueva Compra
-    </h2>
-
-    <form [formGroup]="form" (ngSubmit)="guardar()" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-      
-      <div class="col-span-1 md:col-span-2 lg:col-span-3">
-        <label class="block text-sm font-medium text-gray-700 mb-1">Descripción de la compra</label>
-        <input formControlName="descripcion" 
-               class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none" 
-               placeholder="Ej. Saco de harina 50kg" />
+  <div class="w-full bg-white rounded-xl shadow-sm border border-slate-200 p-4 mb-6 flex flex-col md:flex-row justify-between items-center gap-4">
+    
+    <div class="flex items-center gap-4">
+      <div class="h-12 w-12 bg-blue-600 rounded-lg flex items-center justify-center text-2xl text-white shadow-md">
+        🛒
       </div>
-
       <div>
-        <label class="block text-sm font-medium text-gray-700 mb-1">Proveedor</label>
-        <select formControlName="proveedorId" 
-                class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 bg-white">
-          <option value="">-- Seleccionar --</option>
-          <option *ngFor="let p of proveedores" [value]="p.id">{{ p.nombre }}</option>
-        </select>
+        <h1 class="text-2xl font-extrabold text-slate-800 tracking-tight">Gestión de Abastecimiento</h1>
+        <p class="text-sm text-slate-500 font-medium">Control total de inventario</p>
       </div>
+    </div>
 
-      <div>
-        <label class="block text-sm font-medium text-gray-700 mb-1">Ingrediente a Reponer</label>
-        <select formControlName="id_ingrediente" 
-                class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 bg-white">
-          <option [ngValue]="null">-- Seleccionar Ingrediente --</option>
-          <option *ngFor="let ing of ingredientes" [value]="ing.id">
-            {{ ing.nombre_ingrediente }} (Stock: {{ ing.peso | number:'1.0-2' }} {{ing.unidad_medida}})
-          </option>
-        </select>
-        <p class="text-xs text-gray-500 mt-1">Esto sumará al inventario automáticamente.</p>
-      </div>
+    <div class="flex bg-slate-100 p-1 rounded-lg w-full md:w-auto">
+      <button 
+        (click)="vistaActual = 'registro'"
+        class="flex-1 md:flex-none px-8 py-2.5 rounded-md text-sm font-bold transition-all duration-200"
+        [class.bg-white]="vistaActual === 'registro'"
+        [class.text-blue-700]="vistaActual === 'registro'"
+        [class.shadow-sm]="vistaActual === 'registro'"
+        [class.text-slate-500]="vistaActual !== 'registro'">
+        📦 Registrar Stock
+      </button>
 
-      <div>
-        <label class="block text-sm font-medium text-gray-700 mb-1">Peso Comprado (kg)</label>
-        <input type="number" formControlName="peso_kg" 
-               class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none" 
-               placeholder="0.00" />
-      </div>
-
-      <div>
-        <label class="block text-sm font-medium text-gray-700 mb-1">Costo Total ($)</label>
-        <input type="number" formControlName="costo_total" 
-               class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none" 
-               placeholder="0.00" />
-      </div>
-
-      <div>
-        <label class="block text-sm font-medium text-gray-700 mb-1">Fecha de Compra</label>
-        <input type="date" formControlName="fecha_compra" 
-               class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-gray-600" />
-      </div>
-
-      <div class="flex items-end md:col-span-2 lg:col-span-1">
-        <button type="submit" [disabled]="cargando" 
-                class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg shadow transition duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex justify-center items-center gap-2">
-          <span *ngIf="!cargando">💾 Guardar Compra</span>
-          <span *ngIf="cargando">Guardando...</span>
-        </button>
-      </div>
-    </form>
-
-    <div *ngIf="mensaje" [class.bg-green-100]="!mensaje.includes('Error')" [class.text-green-700]="!mensaje.includes('Error')" 
-         [class.bg-red-100]="mensaje.includes('Error')" [class.text-red-700]="mensaje.includes('Error')"
-         class="mt-4 p-4 rounded-lg border flex items-center gap-2 animate-fade-in">
-      {{ mensaje }}
+      <button 
+        (click)="vistaActual = 'calculadora'"
+        class="flex-1 md:flex-none px-8 py-2.5 rounded-md text-sm font-bold transition-all duration-200"
+        [class.bg-white]="vistaActual === 'calculadora'"
+        [class.text-purple-700]="vistaActual === 'calculadora'"
+        [class.shadow-sm]="vistaActual === 'calculadora'"
+        [class.text-slate-500]="vistaActual !== 'calculadora'">
+        🧮 Calculadora
+      </button>
     </div>
   </div>
 
-  <div class="bg-white rounded-lg shadow-lg overflow-hidden border border-gray-100">
-    <div class="p-4 bg-gray-50 border-b border-gray-200">
-      <h3 class="font-bold text-gray-700 text-lg">📦 Historial Reciente</h3>
-    </div>
+  <div *ngIf="vistaActual === 'registro'" class="w-full animate-fade-in space-y-6">
+    
+    <div class="w-full bg-white rounded-xl shadow-lg border border-slate-100 overflow-hidden">
+      <div class="px-6 py-3 bg-slate-50 border-b border-slate-200 flex items-center gap-2">
+        <span class="w-2 h-2 rounded-full bg-blue-500"></span>
+        <h2 class="text-xs font-bold text-slate-500 uppercase tracking-wider">Nueva Entrada</h2>
+      </div>
 
-    <div class="overflow-x-auto">
-      <table class="w-full text-left border-collapse">
-        <thead class="bg-gray-100 text-gray-600 uppercase text-xs tracking-wider">
-          <tr>
-            <th class="p-4 font-semibold">Producto</th>
-            <th class="p-4 font-semibold">Proveedor</th>
-            <th class="p-4 font-semibold">Peso (kg)</th>
-            <th class="p-4 font-semibold">Costo ($)</th>
-            <th class="p-4 font-semibold">Fecha</th>
-            <th class="p-4 font-semibold text-center">Acciones</th>
-          </tr>
-        </thead>
-        <tbody class="text-sm text-gray-700 divide-y divide-gray-100">
-          <tr *ngFor="let compra of compras" class="hover:bg-blue-50 transition duration-150">
-            <td class="p-4 font-medium">
-              {{ compra.nombre_presentacion }}
-              <div *ngIf="compra.ingrediente" class="text-xs text-gray-400">Ref: {{ compra.ingrediente.nombre_ingrediente }}</div>
-            </td>
-            
-            <td class="p-4 text-gray-500">
-              <span class="bg-gray-100 text-gray-800 py-1 px-2 rounded text-xs border border-gray-200">
-                {{ compra.proveedor?.nombre || 'General' }}
-              </span>
-            </td>
-            
-            <td class="p-4">{{ compra.peso_kg | number:'1.2-2' }}</td>
-            
-            <td class="p-4 font-bold text-green-600">${{ compra.costo_final | number:'1.2-2' }}</td>
-            
-            <td class="p-4 text-gray-500">{{ compra.fecha_compra | date:'shortDate' }}</td>
-            
-            <td class="p-4 text-center">
-              <button (click)="eliminarCompra(compra.id!)" 
-                      class="text-red-500 hover:text-red-700 hover:bg-red-50 p-2 rounded-full transition"
-                      title="Eliminar compra">
-                🗑️
-              </button>
-            </td>
-          </tr>
+      <div class="p-6">
+        <form [formGroup]="form" (ngSubmit)="guardar()" class="grid grid-cols-1 md:grid-cols-4 gap-6">
           
-          <tr *ngIf="compras.length === 0">
-            <td colspan="6" class="p-8 text-center text-gray-400 italic">
-              No hay compras registradas aún.
-            </td>
-          </tr>
-        </tbody>
-      </table>
+          <div class="md:col-span-2">
+            <label class="block text-xs font-bold text-slate-500 uppercase mb-2 ml-1">Descripción</label>
+            <input formControlName="descripcion" 
+                   class="w-full h-12 px-4 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none text-slate-700 font-medium placeholder-slate-400" 
+                   placeholder="Ej. Compra semanal de abarrotes" />
+          </div>
+
+          <div class="md:col-span-1">
+            <label class="block text-xs font-bold text-slate-500 uppercase mb-2 ml-1">Proveedor</label>
+            <select formControlName="proveedorId" 
+                    class="w-full h-12 px-4 border border-slate-300 rounded-lg bg-white focus:ring-2 focus:ring-blue-500 outline-none cursor-pointer font-medium text-slate-700">
+              <option value="">-- Seleccionar --</option>
+              <option *ngFor="let p of proveedores" [value]="p.id">{{ p.nombre }}</option>
+            </select>
+          </div>
+
+          <div class="md:col-span-1">
+            <label class="block text-xs font-bold text-blue-600 uppercase mb-2 ml-1 flex items-center gap-1">
+              Ingrediente (+Stock) ℹ️
+            </label>
+            <select formControlName="id_ingrediente" 
+                    class="w-full h-12 px-4 border border-blue-300 bg-blue-50 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none cursor-pointer font-bold text-slate-700">
+              <option [ngValue]="null">-- Seleccionar --</option>
+              <option *ngFor="let ing of ingredientes" [value]="ing.id">
+                {{ ing.nombre_ingrediente }}
+              </option>
+            </select>
+          </div>
+
+          <div class="md:col-span-1">
+            <label class="block text-xs font-bold text-slate-500 uppercase mb-2 ml-1">Fecha</label>
+            <input type="date" formControlName="fecha_compra" 
+                   class="w-full h-12 px-4 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none text-slate-600 font-medium" />
+          </div>
+
+          <div class="md:col-span-1">
+            <label class="block text-xs font-bold text-slate-500 uppercase mb-2 ml-1">Peso (kg)</label>
+            <input type="number" formControlName="peso_kg" 
+                   class="w-full h-12 px-4 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none font-bold text-slate-800" 
+                   placeholder="0.00" />
+          </div>
+
+          <div class="md:col-span-1">
+            <label class="block text-xs font-bold text-slate-500 uppercase mb-2 ml-1">Costo Total</label>
+            <div class="relative">
+              <span class="absolute left-4 top-3 text-slate-400 font-bold text-lg">$</span>
+              <input type="number" formControlName="costo_total" 
+                     class="w-full h-12 pl-10 pr-4 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none font-bold text-slate-800" 
+                     placeholder="0.00" />
+            </div>
+          </div>
+
+          <div class="md:col-span-1">
+            <label class="block text-xs font-bold text-transparent uppercase mb-2">Acción</label>
+            <button type="submit" [disabled]="cargando" 
+                    class="w-full h-12 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-lg shadow-md transition-all flex items-center justify-center gap-2">
+              <span *ngIf="!cargando" class="text-base">Guardar</span>
+              <span *ngIf="cargando">Procesando...</span>
+            </button>
+          </div>
+
+        </form>
+
+        <div *ngIf="mensaje" class="mt-4 p-3 rounded-lg border text-sm font-bold flex items-center justify-center gap-2"
+             [class.bg-green-100]="!mensaje.includes('Error')" [class.text-green-800]="!mensaje.includes('Error')" 
+             [class.bg-red-100]="mensaje.includes('Error')" [class.text-red-800]="mensaje.includes('Error')">
+           <span>{{ mensaje.includes('Error') ? '⚠️' : '✅' }}</span>
+           <span>{{ mensaje }}</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="w-full bg-white rounded-xl shadow-lg border border-slate-100 overflow-hidden">
+      <div class="px-6 py-4 border-b border-slate-200 bg-slate-50 flex justify-between items-center">
+        <h3 class="font-bold text-slate-700 uppercase text-xs tracking-wide">Historial Reciente</h3>
+      </div>
+      <div class="overflow-x-auto">
+        <table class="w-full text-left">
+          <thead class="bg-white text-slate-500 text-xs uppercase font-bold border-b border-slate-200">
+            <tr>
+              <th class="p-4">Descripción / Producto</th>
+              <th class="p-4">Proveedor</th>
+              <th class="p-4">Peso</th>
+              <th class="p-4">Costo</th>
+              <th class="p-4">Fecha</th>
+              <th class="p-4 text-center">Acción</th>
+            </tr>
+          </thead>
+          <tbody class="text-sm divide-y divide-slate-100 text-slate-700">
+            <tr *ngFor="let c of compras" class="hover:bg-slate-50 transition-colors">
+              <td class="p-4 font-bold">
+                {{ c.nombre_presentacion }}
+                <span *ngIf="c.ingrediente" class="ml-2 bg-green-100 text-green-800 text-[10px] px-2 py-0.5 rounded-full border border-green-200">STOCK</span>
+              </td>
+              <td class="p-4">{{ c.proveedor?.nombre || '-' }}</td>
+              <td class="p-4 font-mono">{{ c.peso_kg | number:'1.2-2' }} kg</td>
+              <td class="p-4 font-bold text-green-600">$ {{ c.costo_final | number:'1.2-2' }}</td>
+              <td class="p-4 text-xs text-slate-500">{{ c.fecha_compra | date:'shortDate' }}</td>
+              <td class="p-4 text-center">
+                <button (click)="eliminarCompra(c.id!)" class="text-slate-400 hover:text-red-500 p-2 transition">🗑️</button>
+              </td>
+            </tr>
+            <tr *ngIf="compras.length === 0">
+              <td colspan="6" class="p-8 text-center text-slate-400 italic">No hay registros aún.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
     </div>
   </div>
+
+  <div *ngIf="vistaActual === 'calculadora'" class="w-full animate-fade-in space-y-6">
+    <div class="w-full bg-white rounded-xl shadow-lg border border-purple-100 overflow-hidden">
+      <div class="bg-gradient-to-r from-purple-600 to-indigo-600 p-5 flex items-center gap-3">
+        <span class="text-2xl bg-white/20 p-2 rounded-lg">🎉</span>
+        <h2 class="text-white font-bold text-lg">Planificador de Eventos</h2>
+      </div>
+      
+      <div class="p-6 grid grid-cols-1 md:grid-cols-4 gap-6 items-end bg-purple-50">
+        <div class="md:col-span-2">
+          <label class="block text-xs font-bold text-purple-800 uppercase mb-2">Receta</label>
+          <select [(ngModel)]="recetaSeleccionadaId" class="w-full h-12 px-4 border border-purple-200 rounded-lg bg-white outline-none font-medium text-slate-700">
+            <option [ngValue]="null">-- Seleccionar --</option>
+            <option *ngFor="let r of listaRecetas" [value]="r.id">{{ r.nombreReceta }}</option>
+          </select>
+        </div>
+        <div class="md:col-span-1">
+          <label class="block text-xs font-bold text-purple-800 uppercase mb-2">Platos</label>
+          <input [(ngModel)]="cantidadPlatosAProducir" type="number" class="w-full h-12 px-4 border border-purple-200 rounded-lg text-center font-bold text-lg outline-none text-purple-900" placeholder="100">
+        </div>
+        <div class="md:col-span-1">
+          <button (click)="calcularCompras()" class="w-full h-12 bg-purple-600 hover:bg-purple-700 text-white font-bold rounded-lg shadow-lg transition-transform hover:-translate-y-0.5">🚀 Calcular</button>
+        </div>
+      </div>
+    </div>
+    
+    <div *ngIf="listaNecesidades.length > 0" class="w-full bg-white rounded-xl shadow border border-slate-100 overflow-hidden">
+       <div class="bg-purple-50 p-4 font-bold text-purple-900 border-b border-purple-100">📝 Lista de Compras Generada</div>
+       <table class="w-full text-sm text-left">
+         <thead class="bg-white text-slate-500 text-xs font-bold uppercase border-b">
+           <tr><th class="p-4">Ingrediente</th><th class="p-4 text-center">Unidad</th><th class="p-4 text-right">TOTAL</th></tr>
+         </thead>
+         <tbody class="divide-y divide-slate-100">
+           <tr *ngFor="let item of listaNecesidades">
+             <td class="p-4 font-bold text-slate-700">{{ item.ingrediente }}</td>
+             <td class="p-4 text-center text-slate-500">{{ item.unidad }}</td>
+             <td class="p-4 text-right font-bold text-purple-600 text-lg">{{ item.cantidad_total | number:'1.2-2' }}</td>
+           </tr>
+         </tbody>
+       </table>
+    </div>
+  </div>
+
 </div>

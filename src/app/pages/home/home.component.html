@@ -1,101 +1,154 @@
-<div class="max-w-7xl mx-auto p-4 md:p-6 space-y-8">
+<div class="max-w-7xl mx-auto p-4 md:p-6 space-y-8 font-sans bg-slate-50 min-h-screen">
   
-  <div class="flex flex-col md:flex-row justify-between items-center mb-6">
-    <div>
-      <h1 class="text-3xl font-bold text-gray-800">👋 ¡Hola de nuevo!</h1>
-      <p class="text-gray-500 mt-1">Aquí tienes el resumen de tu cocina hoy.</p>
-    </div>
-    <div class="mt-4 md:mt-0">
-      <span class="bg-blue-100 text-blue-800 text-sm font-medium px-4 py-2 rounded-full">
-        📅 {{ stats.fechaActual | date:'fullDate' }}
-      </span>
-    </div>
-  </div>
-
-  <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+  <div class="relative bg-gradient-to-r from-blue-700 to-indigo-800 rounded-3xl p-8 md:p-12 shadow-2xl shadow-blue-900/20 overflow-hidden text-white">
+    <div class="absolute top-0 right-0 -mr-20 -mt-20 w-64 h-64 rounded-full bg-white opacity-5"></div>
+    <div class="absolute bottom-0 left-0 -ml-20 -mb-20 w-40 h-40 rounded-full bg-white opacity-5"></div>
     
-    <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 flex items-center gap-4">
-      <div class="p-4 bg-orange-100 text-orange-600 rounded-full text-2xl">🍲</div>
+    <div class="relative z-10 flex flex-col md:flex-row justify-between items-end gap-6">
       <div>
-        <p class="text-sm text-gray-500 font-medium">Recetas Creadas</p>
-        <h3 class="text-2xl font-bold text-gray-800">{{ stats.totalRecetas }}</h3>
+        <p class="text-blue-200 font-bold uppercase tracking-wider text-sm mb-1">Panel de Control</p>
+        <h1 class="text-3xl md:text-4xl font-extrabold tracking-tight">¡Hola de nuevo!</h1>
+        <p class="text-blue-100 mt-2 text-lg max-w-lg">
+          Aquí tienes el resumen financiero y operativo de tu cocina hoy.
+        </p>
       </div>
-    </div>
-
-    <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 flex items-center gap-4">
-      <div class="p-4 bg-green-100 text-green-600 rounded-full text-2xl">🥬</div>
-      <div>
-        <p class="text-sm text-gray-500 font-medium">Ingredientes en Stock</p>
-        <h3 class="text-2xl font-bold text-gray-800">{{ stats.totalIngredientes }}</h3>
-      </div>
-    </div>
-
-    <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 flex items-center gap-4">
-      <div class="p-4 bg-blue-100 text-blue-600 rounded-full text-2xl">💰</div>
-      <div>
-        <p class="text-sm text-gray-500 font-medium">Valor del Inventario</p>
-        <h3 class="text-2xl font-bold text-gray-800">$ {{ stats.valorInventario | number:'1.2-2' }}</h3>
+      
+      <div class="bg-white/10 backdrop-blur-md border border-white/20 px-6 py-3 rounded-2xl flex items-center gap-3 shadow-lg">
+        <span class="text-2xl">📅</span>
+        <span class="font-bold text-white">{{ stats.fechaActual | date:'fullDate' }}</span>
       </div>
     </div>
   </div>
 
-  <div>
-    <h2 class="text-xl font-bold text-gray-800 mb-4">🚀 Accesos Rápidos</h2>
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-6 -mt-8 px-2 relative z-20">
+    
+    <div class="bg-white p-6 rounded-2xl shadow-xl shadow-slate-200 border-b-4 border-orange-500 hover:-translate-y-1 transition-transform duration-300">
+      <div class="flex justify-between items-start">
+        <div>
+          <p class="text-xs font-bold text-slate-400 uppercase tracking-widest">Recetas</p>
+          <h3 class="text-4xl font-black text-slate-800 mt-2">{{ stats.totalRecetas }}</h3>
+        </div>
+        <div class="h-12 w-12 bg-orange-100 rounded-xl flex items-center justify-center text-2xl text-orange-600">
+          🍲
+        </div>
+      </div>
+      <div class="mt-4 text-xs text-orange-600 font-bold flex items-center gap-1">
+        <span>●</span> Activas en el menú
+      </div>
+    </div>
+
+    <div class="bg-white p-6 rounded-2xl shadow-xl shadow-slate-200 border-b-4 border-emerald-500 hover:-translate-y-1 transition-transform duration-300">
+      <div class="flex justify-between items-start">
+        <div>
+          <p class="text-xs font-bold text-slate-400 uppercase tracking-widest">Ingredientes</p>
+          <h3 class="text-4xl font-black text-slate-800 mt-2">{{ stats.totalIngredientes }}</h3>
+        </div>
+        <div class="h-12 w-12 bg-emerald-100 rounded-xl flex items-center justify-center text-2xl text-emerald-600">
+          🥬
+        </div>
+      </div>
+      <div class="mt-4 text-xs text-emerald-600 font-bold flex items-center gap-1">
+        <span>●</span> Disponibles en almacén
+      </div>
+    </div>
+
+    <div class="bg-white p-6 rounded-2xl shadow-xl shadow-slate-200 border-b-4 border-blue-600 hover:-translate-y-1 transition-transform duration-300">
+      <div class="flex justify-between items-start">
+        <div>
+          <p class="text-xs font-bold text-slate-400 uppercase tracking-widest">Valor Inventario</p>
+          <h3 class="text-4xl font-black text-slate-800 mt-2 tracking-tight">$ {{ stats.valorInventario | number:'1.2-2' }}</h3>
+        </div>
+        <div class="h-12 w-12 bg-blue-100 rounded-xl flex items-center justify-center text-2xl text-blue-600">
+          💰
+        </div>
+      </div>
+      <div class="mt-4 text-xs text-blue-600 font-bold flex items-center gap-1">
+        <span>●</span> Capital invertido
+      </div>
+    </div>
+  </div>
+
+  <div class="pt-4">
+    <h2 class="text-xl font-bold text-slate-800 mb-6 flex items-center gap-2 px-2">
+      <span class="bg-indigo-100 text-indigo-600 p-1.5 rounded-lg text-sm">🚀</span>
+      Acciones Rápidas
+    </h2>
     <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
       
-      <a routerLink="/ingredientes" class="bg-white p-4 rounded-lg shadow-sm border border-gray-200 hover:shadow-md hover:border-blue-400 transition flex flex-col items-center gap-2 group">
-        <span class="text-3xl group-hover:scale-110 transition">🧂</span>
-        <span class="font-medium text-gray-700 group-hover:text-blue-600">Ingredientes</span>
+      <a routerLink="/ingredientes" class="group bg-white p-6 rounded-2xl shadow-md shadow-slate-200 border border-slate-100 hover:border-indigo-500 hover:ring-1 hover:ring-indigo-500 transition-all cursor-pointer">
+        <div class="flex flex-col items-center gap-3">
+          <div class="h-14 w-14 bg-indigo-50 rounded-full flex items-center justify-center text-3xl group-hover:scale-110 transition-transform">🧂</div>
+          <span class="font-bold text-slate-600 group-hover:text-indigo-600">Ingredientes</span>
+        </div>
       </a>
 
-      <a routerLink="/compras" class="bg-white p-4 rounded-lg shadow-sm border border-gray-200 hover:shadow-md hover:border-blue-400 transition flex flex-col items-center gap-2 group">
-        <span class="text-3xl group-hover:scale-110 transition">🛒</span>
-        <span class="font-medium text-gray-700 group-hover:text-blue-600">Registrar Compra</span>
+      <a routerLink="/compras" class="group bg-white p-6 rounded-2xl shadow-md shadow-slate-200 border border-slate-100 hover:border-blue-500 hover:ring-1 hover:ring-blue-500 transition-all cursor-pointer">
+        <div class="flex flex-col items-center gap-3">
+          <div class="h-14 w-14 bg-blue-50 rounded-full flex items-center justify-center text-3xl group-hover:scale-110 transition-transform">🛒</div>
+          <span class="font-bold text-slate-600 group-hover:text-blue-600">Registrar Compra</span>
+        </div>
       </a>
 
-      <a routerLink="/recetas" class="bg-white p-4 rounded-lg shadow-sm border border-gray-200 hover:shadow-md hover:border-blue-400 transition flex flex-col items-center gap-2 group">
-        <span class="text-3xl group-hover:scale-110 transition">📝</span>
-        <span class="font-medium text-gray-700 group-hover:text-blue-600">Nueva Receta</span>
+      <a routerLink="/recetas" class="group bg-white p-6 rounded-2xl shadow-md shadow-slate-200 border border-slate-100 hover:border-orange-500 hover:ring-1 hover:ring-orange-500 transition-all cursor-pointer">
+        <div class="flex flex-col items-center gap-3">
+          <div class="h-14 w-14 bg-orange-50 rounded-full flex items-center justify-center text-3xl group-hover:scale-110 transition-transform">📝</div>
+          <span class="font-bold text-slate-600 group-hover:text-orange-600">Nueva Receta</span>
+        </div>
       </a>
 
-      <a routerLink="/listar-recetas" class="bg-white p-4 rounded-lg shadow-sm border border-gray-200 hover:shadow-md hover:border-blue-400 transition flex flex-col items-center gap-2 group">
-        <span class="text-3xl group-hover:scale-110 transition">📖</span>
-        <span class="font-medium text-gray-700 group-hover:text-blue-600">Ver Fichas</span>
+      <a routerLink="/listar-recetas" class="group bg-white p-6 rounded-2xl shadow-md shadow-slate-200 border border-slate-100 hover:border-emerald-500 hover:ring-1 hover:ring-emerald-500 transition-all cursor-pointer">
+        <div class="flex flex-col items-center gap-3">
+          <div class="h-14 w-14 bg-emerald-50 rounded-full flex items-center justify-center text-3xl group-hover:scale-110 transition-transform">📖</div>
+          <span class="font-bold text-slate-600 group-hover:text-emerald-600">Ver Fichas</span>
+        </div>
       </a>
 
     </div>
   </div>
 
-  <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
-    <div class="p-6 border-b border-gray-100 flex justify-between items-center">
-      <h3 class="text-lg font-bold text-gray-800">📦 Últimas Compras Registradas</h3>
-      <a routerLink="/compras" class="text-sm text-blue-600 hover:underline">Ver todo</a>
+  <div class="bg-white rounded-3xl shadow-lg shadow-slate-200 overflow-hidden border border-slate-100">
+    <div class="p-6 bg-slate-50 border-b border-slate-200 flex justify-between items-center">
+      <h3 class="text-lg font-bold text-slate-800">📦 Últimos Movimientos de Stock</h3>
+      <a routerLink="/compras" class="text-sm font-bold text-indigo-600 hover:text-indigo-800 transition">Ver historial completo →</a>
     </div>
     
     <div class="overflow-x-auto">
       <table class="w-full text-left">
-        <thead class="bg-gray-50 text-gray-500 text-xs uppercase">
+        <thead class="bg-white text-slate-400 text-xs font-bold uppercase tracking-wider">
           <tr>
-            <th class="px-6 py-3 font-semibold">Producto / Descripción</th>
-            <th class="px-6 py-3 font-semibold">Proveedor</th>
-            <th class="px-6 py-3 font-semibold">Costo</th>
-            <th class="px-6 py-3 font-semibold">Fecha</th>
+            <th class="px-8 py-4">Producto</th>
+            <th class="px-6 py-4">Proveedor</th>
+            <th class="px-6 py-4">Costo Total</th>
+            <th class="px-6 py-4">Fecha</th>
           </tr>
         </thead>
-        <tbody class="divide-y divide-gray-100">
-          <tr *ngFor="let compra of stats.ultimasCompras" class="hover:bg-gray-50">
-            <td class="px-6 py-4 font-medium text-gray-800">
-              {{ compra.ingrediente?.nombre_ingrediente || compra.nombre_presentacion }}
-              <span *ngIf="compra.ingrediente" class="ml-2 text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded-full">Stock</span>
+        <tbody class="divide-y divide-slate-100">
+          <tr *ngFor="let compra of stats.ultimasCompras" class="hover:bg-indigo-50/50 transition-colors">
+            <td class="px-8 py-4">
+              <div class="font-bold text-slate-700">{{ compra.ingrediente?.nombre_ingrediente || compra.nombre_presentacion }}</div>
+              <div class="text-xs text-slate-400 mt-0.5">Entrada de Almacén</div>
             </td>
-            <td class="px-6 py-4 text-sm text-gray-500">{{ compra.proveedor?.nombre || 'General' }}</td>
-            <td class="px-6 py-4 font-bold text-gray-800">$ {{ compra.costo_final | number:'1.2-2' }}</td>
-            <td class="px-6 py-4 text-sm text-gray-500">{{ compra.fecha_compra | date:'shortDate' }}</td>
+            <td class="px-6 py-4">
+              <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-slate-100 text-slate-800">
+                {{ compra.proveedor?.nombre || 'Varios' }}
+              </span>
+            </td>
+            <td class="px-6 py-4">
+              <span class="font-bold text-emerald-600 bg-emerald-50 px-3 py-1 rounded-lg border border-emerald-100">
+                $ {{ compra.costo_final | number:'1.2-2' }}
+              </span>
+            </td>
+            <td class="px-6 py-4 text-sm text-slate-500">
+              {{ compra.fecha_compra | date:'dd MMM, yyyy' }}
+            </td>
           </tr>
           
           <tr *ngIf="!stats.ultimasCompras || stats.ultimasCompras.length === 0">
-            <td colspan="4" class="px-6 py-8 text-center text-gray-400 italic">
-              Aún no has registrado compras. ¡Ve a la sección de compras para empezar!
+            <td colspan="4" class="px-8 py-12 text-center">
+              <div class="flex flex-col items-center justify-center text-slate-400">
+                <span class="text-4xl mb-2 opacity-50">📂</span>
+                <p>No hay registros recientes.</p>
+              </div>
             </td>
           </tr>
         </tbody>

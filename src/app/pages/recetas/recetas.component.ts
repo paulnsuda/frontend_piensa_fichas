@@ -1,8 +1,7 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Router, RouterModule } from '@angular/router';
-
+import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { RecetaService } from '../../services/recetas.service';
 import { IngredienteService } from '../../services/ingredientes.service';
 
@@ -11,62 +10,109 @@ import { IngredienteService } from '../../services/ingredientes.service';
   standalone: true,
   imports: [CommonModule, FormsModule, RouterModule],
   templateUrl: './recetas.component.html',
-  styleUrls: ['./recetas.component.css'],
+  styleUrls: ['./recetas.component.css']
 })
 export class RecetasComponent implements OnInit {
-  
   private recetaService = inject(RecetaService);
   private ingredienteService = inject(IngredienteService);
   private router = inject(Router);
+  private route = inject(ActivatedRoute); 
 
+  // --- VARIABLES DE CONTROL ---
+  esEdicion = false;
+  idRecetaEditar: number | null = null;
+  
+  // Base de datos de ingredientes cargada
   listaIngredientes: any[] = [];
 
-  ingredienteSeleccionadoId: number | null = null;
+  // --- VARIABLES DEL BUSCADOR VISUAL (HTML) ---
+  nombreIngredienteBusqueda: string = '';
   cantidadAgregar: number = 0;
-
-  // Variables de UX
-  nombreIngredienteBusqueda: string = ''; 
-  unidadSeleccionada: string = '';        
-  costoRealUnitario: number = 0; 
-
-  // Objeto de la Receta (Con Rentabilidad y Precio Venta)
-  nuevaReceta: any = {
+  
+  // Variables para la Vista Previa (Preview)
+  ingredienteSeleccionadoId: number | null = null;
+  unidadSeleccionada: string = '';
+  costoRealUnitario: number = 0;
+  
+  // --- MODELO DE LA RECETA ---
+  nuevaReceta: any = { 
     nombre_receta: '',
     tipo_plato: 'Plato Principal',
-    num_porciones: 4,
-    tamano_porcion: '',
+    num_porciones: 1,
+    tamano_porcion: 0,
     procedimiento: '',
-    
     costo_receta: 0,
-    
-    // 👇 NUEVO: Valores por defecto para finanzas
-    rentabilidad: 30, // 30% es el estándar de la industria
+    rentabilidad: 30,
     precio_venta: 0,
-    
-    recetasIngredientes: []
+    recetasIngredientes: [] 
   };
 
-  ngOnInit(): void {
-    this.cargarIngredientesDisponibles();
+  ngOnInit() {
+    this.cargarIngredientes();
+    
+    // DETECTAR SI VENIMOS A EDITAR (URL tiene un ID)
+    this.route.paramMap.subscribe(params => {
+      const id = params.get('id');
+      if (id) {
+        this.esEdicion = true;
+        this.idRecetaEditar = Number(id);
+        this.cargarDatosReceta(this.idRecetaEditar);
+      }
+    });
   }
 
-  cargarIngredientesDisponibles(): void {
+  cargarIngredientes() {
     this.ingredienteService.findAll().subscribe(data => {
       this.listaIngredientes = data;
     });
   }
 
-  // BUSCADOR INTELIGENTE
-  alSeleccionarIngrediente(evento: any): void {
-    const valorInput = evento.target.value;
-    const encontrado = this.listaIngredientes.find(i => i.nombre_ingrediente === valorInput);
+  // --- LÓGICA DE EDICIÓN ---
+  cargarDatosReceta(id: number) {
+    this.recetaService.findOne(id).subscribe({
+      next: (data) => {
+        // Mapeamos lo que llega del backend
+        this.nuevaReceta = {
+          nombre_receta: data.nombreReceta,
+          tipo_plato: data.tipoPlato,
+          num_porciones: data.numPorciones,
+          
+          // 👇 CONVERSIÓN DE CARGA: Kilos (BD) -> Gramos (Visual)
+          // Si en la BD dice 0.5 kg, aquí mostramos 500
+          tamano_porcion: (Number(data.tamanoPorcion) || 0) * 1000,
+          
+          procedimiento: data.procedimiento,
+          costo_receta: data.costoReceta,
+          rentabilidad: data.rentabilidad || 30,
+          precio_venta: data.precioVenta || 0,
+          
+          // Mapeamos los ingredientes para la tabla visual
+          recetasIngredientes: data.recetasIngredientes.map((ri: any) => ({
+            id_ingrediente: ri.ingrediente.id,
+            nombre: ri.ingrediente.nombre_ingrediente,
+            unidad: ri.ingrediente.unidad_medida,
+            cantidad_usada: ri.cantidad_usada,
+            // Precio: Usamos el histórico guardado o el actual si no existe
+            precio: Number(ri.costo_historico) || Number(ri.ingrediente.precio_real),
+            subtotal: ri.cantidad_usada * (Number(ri.costo_historico) || Number(ri.ingrediente.precio_real))
+          }))
+        };
+        this.calcularTotal();
+      },
+      error: (e) => alert('Error al cargar receta: ' + e.message)
+    });
+  }
+
+  // --- MÉTODOS DEL BUSCADOR VISUAL ---
+
+  alSeleccionarIngrediente(event: any) {
+    const nombre = event.target.value;
+    const encontrado = this.listaIngredientes.find(i => i.nombre_ingrediente === nombre);
 
     if (encontrado) {
       this.ingredienteSeleccionadoId = encontrado.id;
       this.unidadSeleccionada = encontrado.unidad_medida;
-      
-      // Detectamos el precio real (con merma)
-      this.costoRealUnitario = encontrado.precio_real || encontrado.precioKg;
+      this.costoRealUnitario = Number(encontrado.precio_real) || Number(encontrado.precioKg) || 0;
     } else {
       this.ingredienteSeleccionadoId = null;
       this.unidadSeleccionada = '';
@@ -74,111 +120,126 @@ export class RecetasComponent implements OnInit {
     }
   }
 
-  irACrearIngrediente(): void {
-    window.open('/ingredientes', '_blank'); 
-  }
-
-  // AGREGAR A LA RECETA
-  agregarIngrediente(): void {
-    if (!this.ingredienteSeleccionadoId) {
-      alert('Por favor, selecciona un ingrediente válido de la lista.');
-      return;
-    }
-    if (this.cantidadAgregar <= 0) {
-      alert('La cantidad debe ser mayor a 0.');
+  agregarIngrediente() {
+    if (!this.ingredienteSeleccionadoId || this.cantidadAgregar <= 0) {
+      alert('Selecciona un ingrediente válido y una cantidad mayor a 0');
       return;
     }
 
-    const ingEncontrado = this.listaIngredientes.find(i => i.id == this.ingredienteSeleccionadoId);
+    const itemDB = this.listaIngredientes.find(i => i.id === this.ingredienteSeleccionadoId);
+    if (!itemDB) return;
 
-    if (ingEncontrado) {
-      const precioAUsar = ingEncontrado.precio_real || ingEncontrado.precioKg;
+    this.nuevaReceta.recetasIngredientes.push({
+      id_ingrediente: itemDB.id,
+      nombre: itemDB.nombre_ingrediente,
+      unidad: itemDB.unidad_medida,
+      cantidad_usada: this.cantidadAgregar,
+      precio: this.costoRealUnitario,
+      subtotal: this.cantidadAgregar * this.costoRealUnitario
+    });
 
-      this.nuevaReceta.recetasIngredientes.push({
-        id_ingrediente: ingEncontrado.id,
-        nombre: ingEncontrado.nombre_ingrediente, 
-        unidad: ingEncontrado.unidad_medida,      
-        precio: precioAUsar,           
-        cantidad_usada: this.cantidadAgregar,
-        subtotal: (this.cantidadAgregar * precioAUsar)
-      });
+    this.nombreIngredienteBusqueda = '';
+    this.cantidadAgregar = 0;
+    this.ingredienteSeleccionadoId = null;
+    this.unidadSeleccionada = '';
+    this.costoRealUnitario = 0;
 
-      this.calcularTotal();
-
-      // Limpieza del formulario de ingrediente
-      this.ingredienteSeleccionadoId = null;
-      this.cantidadAgregar = 0;
-      this.nombreIngredienteBusqueda = ''; 
-      this.unidadSeleccionada = '';       
-      this.costoRealUnitario = 0;
-    }
+    this.calcularTotal();
   }
 
-  eliminarIngrediente(index: number): void {
+  eliminarIngrediente(index: number) {
     this.nuevaReceta.recetasIngredientes.splice(index, 1);
     this.calcularTotal();
   }
 
-  // 👇 LÓGICA FINANCIERA ACTUALIZADA
-  calcularTotal(): void {
-    // 1. Sumar el costo de producción (Ingredientes)
-    this.nuevaReceta.costo_receta = this.nuevaReceta.recetasIngredientes.reduce(
-      (acc: number, item: any) => acc + item.subtotal, 0
-    );
-
-    // 2. Calcular Precio de Venta en base a la Rentabilidad
-    // Fórmula Gastronómica: Precio = Costo / (1 - %Rentabilidad)
-    const margen = this.nuevaReceta.rentabilidad || 0;
-    
-    if (margen >= 100) {
-      this.nuevaReceta.precio_venta = 0; // Evitar división por cero o márgenes imposibles
-    } else {
-      const factor = 1 - (margen / 100);
-      this.nuevaReceta.precio_venta = this.nuevaReceta.costo_receta / factor;
+  irACrearIngrediente() {
+    if(confirm('Si sales ahora perderás los cambios no guardados. ¿Continuar?')) {
+      this.router.navigate(['/ingredientes']);
     }
   }
 
-  guardarReceta(): void {
-    if (!this.nuevaReceta.nombre_receta) {
-      alert('El nombre de la receta es obligatorio.');
-      return;
-    }
-    if (this.nuevaReceta.recetasIngredientes.length === 0) {
-      alert('Debes agregar al menos un ingrediente.');
-      return;
-    }
+  // --- CÁLCULOS MATEMÁTICOS ---
 
-    const datosParaBackend = {
-      nombre_receta: this.nuevaReceta.nombre_receta,
+  calcularTotal() {
+    let costoTotal = 0;
+    this.nuevaReceta.recetasIngredientes.forEach((item: any) => {
+      item.subtotal = item.cantidad_usada * item.precio;
+      costoTotal += item.subtotal;
+    });
+
+    this.nuevaReceta.costo_receta = costoTotal;
+    
+    const costoPorcion = this.nuevaReceta.costo_receta / (this.nuevaReceta.num_porciones || 1);
+    const rentabilidad = Number(this.nuevaReceta.rentabilidad) || 30;
+
+    if (rentabilidad > 0 && rentabilidad < 100) {
+      this.nuevaReceta.precio_venta = costoPorcion / (rentabilidad / 100);
+    } else {
+      this.nuevaReceta.precio_venta = 0;
+    }
+  }
+
+  // --- GUARDAR EN BASE DE DATOS ---
+
+  guardarReceta() {
+    // 1. Validaciones
+    if (!this.nuevaReceta.nombre_receta) return alert('El nombre del plato es obligatorio');
+    if (this.nuevaReceta.recetasIngredientes.length === 0) return alert('La receta debe tener al menos 1 ingrediente');
+
+    // 2. CONVERSIÓN DE GUARDADO: Gramos (Visual) -> Kilos (BD)
+    // El usuario escribió "200" (gramos). Nosotros guardamos "0.2" (kilos).
+    const pesoEnKilos = Number(this.nuevaReceta.tamano_porcion) / 1000;
+
+    // 3. PREPARAR EL DTO (Backend Friendly)
+    const dtoBackend = {
+      nombre_receta: this.nuevaReceta.nombre_receta, 
       tipo_plato: this.nuevaReceta.tipo_plato,
       num_porciones: Number(this.nuevaReceta.num_porciones),
-      tamano_porcion: this.nuevaReceta.tamano_porcion,
+      
+      // ✅ Enviamos el peso en Kilos, convertido a String
+      tamano_porcion: String(pesoEnKilos), 
+      
       procedimiento: this.nuevaReceta.procedimiento,
       costo_receta: Number(this.nuevaReceta.costo_receta),
-      
-      // 👇 ENVIAMOS LOS DATOS FINANCIEROS
       rentabilidad: Number(this.nuevaReceta.rentabilidad),
       precio_venta: Number(this.nuevaReceta.precio_venta),
-
+      
       recetasIngredientes: this.nuevaReceta.recetasIngredientes.map((item: any) => ({
+        // ✅ Estructura correcta para relaciones TypeORM
+        ingrediente: { id: item.id_ingrediente }, 
+        
         cantidad_usada: Number(item.cantidad_usada),
-        ingrediente: { id: Number(item.id_ingrediente) },
-        costo_historico: Number(item.precio) 
+        costo_historico: Number(item.precio)
       }))
     };
 
-    console.log('Guardando Ficha Técnica Completa:', datosParaBackend);
+    console.log('Enviando DTO (Gramos convertidos a Kilos):', dtoBackend); 
 
-    this.recetaService.create(datosParaBackend).subscribe({
-      next: (res) => {
-        alert('✅ Receta creada con éxito');
-        this.router.navigate(['/listar-recetas']);
-      },
-      error: (err) => {
-        console.error('Error creando receta:', err);
-        const mensaje = err.error?.message || 'Error desconocido';
-        alert('Error al guardar: ' + (Array.isArray(mensaje) ? mensaje.join(', ') : mensaje));
-      }
-    });
+    // 4. ENVIAR AL SERVIDOR
+    if (this.esEdicion && this.idRecetaEditar) {
+      this.recetaService.update(this.idRecetaEditar, dtoBackend).subscribe({
+        next: () => {
+          alert('✅ Ficha actualizada correctamente');
+          this.router.navigate(['/ver-ficha', this.idRecetaEditar]);
+        },
+        error: (e) => {
+          console.error(e);
+          const errorMsg = e.error?.message || e.message;
+          alert('Error al actualizar: ' + (Array.isArray(errorMsg) ? errorMsg.join(', ') : errorMsg));
+        }
+      });
+    } else {
+      this.recetaService.create(dtoBackend).subscribe({
+        next: (resp) => {
+          alert('✅ Ficha creada con éxito');
+          this.router.navigate(['/ver-ficha', resp.id]);
+        },
+        error: (e) => {
+          console.error(e);
+          const errorMsg = e.error?.message || e.message;
+          alert('Error al crear: ' + (Array.isArray(errorMsg) ? errorMsg.join(', ') : errorMsg));
+        }
+      });
+    }
   }
 }

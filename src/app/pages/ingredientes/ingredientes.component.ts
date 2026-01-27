@@ -1,172 +1,158 @@
 import { Component, OnInit } from '@angular/core';
-import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { IngredienteService, Ingrediente } from '../../services/ingredientes.service';
-
-interface FilaVisual extends Ingrediente {
-  editando?: boolean;
-  backup?: Ingrediente;
-}
 
 @Component({
   selector: 'app-ingredientes',
   standalone: true,
   imports: [CommonModule, FormsModule],
   templateUrl: './ingredientes.component.html',
-  styleUrls: ['./ingredientes.component.css'],
+  styleUrls: ['./ingredientes.component.css']
 })
 export class IngredientesComponent implements OnInit {
-  ingredientes: FilaVisual[] = [];
-  ingredientesFiltrados: FilaVisual[] = [];
-  busqueda = '';
+  
+  // 1. VARIABLES QUE PIDE EL HTML
+  ingredientes: Ingrediente[] = [];
+  mostrarModal: boolean = false;
+  modoEdicion: boolean = false;
+  idEdicion: number | null = null;
 
-  nueva: Partial<Ingrediente> = {
-    nombre_ingrediente: '',
-    unidad_medida: 'kg',
-    precioKg: 0,
-    peso: 0,
-    grupo: '',
-    rendimiento: 100,
-    peso_unitario: 1
-  };
+  // Objeto vinculado al formulario del Modal
+  nuevoIngrediente: Ingrediente = this.inicializarIngrediente();
 
-  nuevoGrupo = {
-    nombre: '',
-    descripcion: ''
+  // Filtro de búsqueda
+  filtros = {
+    nombre: ''
   };
 
   constructor(private srv: IngredienteService) {}
 
-  ngOnInit(): void {
-    this.cargar();
+  ngOnInit() {
+    this.cargarIngredientes();
   }
 
-  private limpiarNumero(valor: any): number {
-    if (!valor && valor !== 0) return 0;
-    if (typeof valor === 'string') {
-      return parseFloat(valor.replace(',', '.'));
-    }
-    return Number(valor);
-  }
-
-  calcularPrecioRealPreview(): number {
-    const precio = this.limpiarNumero(this.nueva.precioKg);
-    const rendimiento = this.limpiarNumero(this.nueva.rendimiento);
-    if (rendimiento <= 0) return 0;
-    return precio / (rendimiento / 100);
-  }
-
-  cargar() {
-    this.srv.findAll().subscribe((data: Ingrediente[]) => {
-      this.ingredientes = data;
-      this.filtrarIngredientes();
-    });
-  }
-
-  agregar() {
-    if (!this.nueva.nombre_ingrediente) {
-      alert('El nombre es obligatorio');
-      return;
-    }
-
-    const datosLimpios = {
-      ...this.nueva,
-      precioKg: this.limpiarNumero(this.nueva.precioKg),
-      peso: this.limpiarNumero(this.nueva.peso),
-      rendimiento: this.limpiarNumero(this.nueva.rendimiento) || 100,
-      peso_unitario: this.limpiarNumero(this.nueva.peso_unitario) || 1
-    };
-
-    this.srv.create(datosLimpios).subscribe({
-      next: (ing: Ingrediente) => {
-        this.ingredientes.push(ing);
-        this.filtrarIngredientes();
-        this.nueva = {
-          nombre_ingrediente: '',
-          unidad_medida: 'kg',
-          precioKg: 0,
-          peso: 0,
-          grupo: '',
-          rendimiento: 100,
-          peso_unitario: 1
-        };
-      },
-      error: (err) => {
-        console.error(err);
-        alert('Error al agregar ingrediente');
-      },
-    });
-  }
-
-  editar(f: FilaVisual) {
-    f.backup = { ...f };
-    f.editando = true;
-  }
-
-  guardar(f: FilaVisual) {
-    const dtoLimpios = {
-      nombre_ingrediente: f.nombre_ingrediente,
-      unidad_medida: f.unidad_medida,
-      grupo: f.grupo,
-      precioKg: this.limpiarNumero(f.precioKg),
-      peso: this.limpiarNumero(f.peso),
-      rendimiento: this.limpiarNumero(f.rendimiento),
-      peso_unitario: this.limpiarNumero(f.peso_unitario)
-    };
-
-    // Usamos f.id! con el signo de exclamación para asegurar que existe
-    if (!f.id) return; 
-
-    this.srv.update(f.id, dtoLimpios).subscribe({
-      next: (upd: Ingrediente) => {
-        Object.assign(f, upd);
-        f.editando = false;
-        this.filtrarIngredientes();
-        alert('✅ Ingrediente actualizado');
-      },
-      error: (err) => {
-        const mensaje = err.error?.message || 'Error desconocido';
-        alert('❌ Error: ' + (Array.isArray(mensaje) ? mensaje.join(', ') : mensaje));
-      },
-    });
-  }
-
-  cancelar(f: FilaVisual) {
-    if (f.backup) Object.assign(f, f.backup);
-    f.editando = false;
-  }
-
-  eliminar(f: FilaVisual) {
-    if (!f.id || !confirm(`¿Eliminar "${f.nombre_ingrediente}"?`)) return;
-
-    this.srv.delete(f.id).subscribe({
-      next: () => {
-        this.ingredientes = this.ingredientes.filter((i) => i.id !== f.id);
-        this.filtrarIngredientes();
-      },
-      error: () => alert('Error al eliminar ingrediente'),
-    });
-  }
-
-  // 🔴 CORRECCIÓN CLAVE AQUÍ PARA EL ERROR DE "undefined"
-  filtrarIngredientes() {
-    const texto = (this.busqueda || '').toLowerCase(); // Protegemos this.busqueda
-    
-    this.ingredientesFiltrados = this.ingredientes.filter((i) => {
-      // Protegemos i.nombre_ingrediente y i.grupo con || ''
-      const nombre = (i.nombre_ingrediente || '').toLowerCase();
-      const grupo = (i.grupo || '').toLowerCase();
+  // Helper para reiniciar el objeto limpio
+  private inicializarIngrediente(): Ingrediente {
+    return {
+      nombre_ingrediente: '',
+      unidad_medida: 'kg',
+      grupo: '',
+      precioKg: 0,        // Precio Compra (Bruto)
       
-      return nombre.includes(texto) || grupo.includes(texto);
+      // Datos del Experimento de Merma
+      peso_bruto: 1,      // Defecto 1 (si no se hace test)
+      peso_neto: 1,
+      peso_desperdicio: 0,
+      peso_subproducto: 0,
+      
+      // Resultados calculados
+      rendimiento: 100,
+      peso_unitario: 1,
+      precio_real: 0,
+    };
+  }
+
+  cargarIngredientes() {
+    this.srv.findAll().subscribe((data) => {
+      this.ingredientes = data;
     });
   }
 
-  agregarGrupo() {
-    if (!this.nuevoGrupo.nombre.trim()) {
-      alert('El nombre del grupo es obligatorio');
-      return;
+  // --- MÉTODOS DEL MODAL (Los que daban error) ---
+  
+  abrirModal() {
+    this.mostrarModal = true;
+    this.modoEdicion = false;
+    this.idEdicion = null;
+    this.nuevoIngrediente = this.inicializarIngrediente();
+  }
+
+  cerrarModal() {
+    this.mostrarModal = false;
+    this.nuevoIngrediente = this.inicializarIngrediente();
+  }
+
+  // --- LÓGICA MATEMÁTICA DE MERMAS ---
+
+  calcularMetricas() {
+    // Aseguramos números
+    const bruto = Number(this.nuevoIngrediente.peso_bruto) || 0;
+    const neto = Number(this.nuevoIngrediente.peso_neto) || 0;
+    const precioCompra = Number(this.nuevoIngrediente.precioKg) || 0;
+    const subproducto = Number(this.nuevoIngrediente.peso_subproducto) || 0;
+
+    // 1. Calcular Desperdicio (Basura)
+    // Asumimos: Bruto = Neto + Desperdicio + Subproducto
+    if (bruto >= neto) {
+      this.nuevoIngrediente.peso_desperdicio = bruto - neto - subproducto;
     }
-    console.log('Grupo agregado:', this.nuevoGrupo);
-    this.nuevoGrupo = { nombre: '', descripcion: '' };
+
+    // 2. Calcular Rendimiento %
+    if (bruto > 0) {
+      this.nuevoIngrediente.rendimiento = (neto / bruto) * 100;
+    } else {
+      this.nuevoIngrediente.rendimiento = 0;
+    }
+
+    // 3. Calcular Factor de Corrección (Peso Unitario)
+    if (neto > 0) {
+      this.nuevoIngrediente.peso_unitario = bruto / neto;
+    } else {
+      this.nuevoIngrediente.peso_unitario = 1;
+    }
+
+    // 4. Calcular Precio Real (Costo Técnico)
+    this.nuevoIngrediente.precio_real = precioCompra * (this.nuevoIngrediente.peso_unitario || 1);
+  }
+
+  // --- CRUD ---
+
+  guardar() {
+    // Recalcular por seguridad antes de enviar
+    this.calcularMetricas();
+
+    if (this.modoEdicion && this.idEdicion) {
+      this.srv.update(this.idEdicion, this.nuevoIngrediente).subscribe({
+        next: () => {
+          this.cargarIngredientes();
+          this.cerrarModal();
+        },
+        error: (e) => alert('Error al actualizar: ' + e.message)
+      });
+    } else {
+      this.srv.create(this.nuevoIngrediente).subscribe({
+        next: () => {
+          this.cargarIngredientes();
+          this.cerrarModal();
+        },
+        error: (e) => alert('Error al crear: ' + e.message)
+      });
+    }
+  }
+
+  editar(item: Ingrediente) {
+    this.modoEdicion = true;
+    this.idEdicion = item.id!;
+    // Copia profunda para no editar la tabla visualmente hasta guardar
+    this.nuevoIngrediente = { ...item };
+    this.mostrarModal = true;
+  }
+
+  eliminar(id: number) {
+    if (confirm('¿Estás seguro de eliminar este ingrediente?')) {
+      this.srv.delete(id).subscribe(() => {
+        this.cargarIngredientes();
+      });
+    }
+  }
+
+  // Getter para el filtrado en el HTML
+  get ingredientesFiltrados() {
+    const term = this.filtros.nombre.toLowerCase();
+    return this.ingredientes.filter(i => 
+      (i.nombre_ingrediente || '').toLowerCase().includes(term) || 
+      (i.grupo || '').toLowerCase().includes(term)
+    );
   }
 }

@@ -7,23 +7,30 @@ export interface Ingrediente {
   id?: number;
   nombre_ingrediente: string;
   unidad_medida: string;
-  
-  // 👇 CAMPOS NUEVOS QUE FALTABAN
-  peso: number;           // Cantidad comprada
-  pesoKg?: number;        // Stock calculado (El que daba error)
-  peso_unitario?: number; // Peso de la unidad
-  precioKg: number;       // Precio de compra
-  
-  rendimiento?: number;   // Merma
-  precio_real?: number;   // Calculado
-  
   grupo?: string;
+
+  // PRECIO
+  precioKg: number;       // Precio de compra (Bruto)
+
+  // 👇 CAMPOS DE TRANSFORMACIÓN (TEST DE MERMA) - ¡LOS QUE FALTABAN!
+  peso_bruto?: number;       // Peso inicial (ej: 3.5)
+  peso_neto?: number;        // Peso útil (ej: 1.2)
+  peso_desperdicio?: number; // Basura (ej: 0.3)
+  peso_subproducto?: number; // Huesos/Recortes (ej: 2.0)
+
+  // CALCULADOS
+  rendimiento?: number;   // % Rendimiento
+  peso_unitario?: number; // Factor de corrección
+  precio_real?: number;   // Costo Real ya calculado
+
+  // Identificador de Subficha (para el futuro paso)
+  es_preparacion?: boolean;
+
   deletedAt?: Date;
 }
 
 @Injectable({ providedIn: 'root' })
 export class IngredienteService {
-  // Asegúrate de que apunte a 'ingredientes' (plural)
   private apiUrl = `${environment.apiUrl}/ingredientes`;
 
   constructor(private http: HttpClient) {}
