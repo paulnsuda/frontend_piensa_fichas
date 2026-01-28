@@ -215,7 +215,7 @@ export class RecetasComponent implements OnInit {
 
     console.log('Enviando DTO (Gramos convertidos a Kilos):', dtoBackend); 
 
-    // 4. ENVIAR AL SERVIDOR
+  
     if (this.esEdicion && this.idRecetaEditar) {
       this.recetaService.update(this.idRecetaEditar, dtoBackend).subscribe({
         next: () => {
