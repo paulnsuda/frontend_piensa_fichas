@@ -1,24 +1,25 @@
-import { Component } from '@angular/core';
-import { RouterModule } from '@angular/router';
+import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { RouterModule } from '@angular/router';
 import { AuthService } from '../guards/auth.service';
 
 @Component({
   selector: 'app-layout',
   standalone: true,
-  imports: [RouterModule, CommonModule],
-  templateUrl: './layout.component.html',
-  styleUrls: ['./layout.component.css']
+  imports: [CommonModule, RouterModule],
+  templateUrl: './layout.component.html'
 })
-export class LayoutComponent {
-  rol: string | null = null;
+export class LayoutComponent implements OnInit {
+  private authService = inject(AuthService);
+  
+  rol: string | null = '';
+  menuAbierto = false; // 👈 Agrega esta línea
 
-  constructor(private auth: AuthService) {
-    this.rol = auth.getUserRole();
-
+  ngOnInit() {
+    this.rol = this.authService.getUserRole();
   }
 
   logout() {
-    this.auth.logout();
+    this.authService.logout();
   }
 }

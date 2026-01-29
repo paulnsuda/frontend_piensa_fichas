@@ -1,29 +1,29 @@
-<div class="w-full min-h-screen bg-slate-50 p-6 box-border font-sans">
+<div class="w-full min-h-screen bg-slate-50 p-2 sm:p-6 box-border font-sans">
 
-  <div class="w-full flex justify-between items-center mb-8">
+  <div class="w-full flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
     <div class="flex items-center gap-3">
-      <div class="h-12 w-12 bg-amber-100 rounded-xl flex items-center justify-center text-3xl text-amber-600 shadow-sm border border-amber-200">
+      <div class="h-10 w-10 sm:h-12 sm:w-12 bg-amber-100 rounded-xl flex items-center justify-center text-2xl sm:text-3xl text-amber-600 shadow-sm border border-amber-200">
         👨‍🍳
       </div>
       <div>
-        <h1 class="text-2xl font-extrabold text-slate-800 tracking-tight">
+        <h1 class="text-xl sm:text-2xl font-extrabold text-slate-800 tracking-tight">
           {{ esEdicion ? 'Editar Ficha Técnica' : 'Nueva Receta Maestra' }}
         </h1>
-        <p class="text-sm text-slate-500 font-medium">Alta Cocina (Costos con Merma Automática)</p>
+        <p class="text-xs sm:text-sm text-slate-500 font-medium">Alta Cocina (Costos con Merma Automática)</p>
       </div>
     </div>
 
     <a [routerLink]="['/listar-recetas']" 
-       class="bg-white border border-slate-200 text-slate-600 hover:text-blue-600 hover:border-blue-200 hover:bg-blue-50 px-5 py-2.5 rounded-lg font-bold transition-all shadow-sm flex items-center gap-2 cursor-pointer select-none">
+       class="w-full sm:w-auto text-center bg-white border border-slate-200 text-slate-600 hover:text-blue-600 hover:border-blue-200 hover:bg-blue-50 px-5 py-2.5 rounded-lg font-bold transition-all shadow-sm flex items-center justify-center gap-2 cursor-pointer select-none">
       <span>&larr;</span> Volver al Menú
     </a>
   </div>
 
-  <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 w-full">
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 sm:gap-8 w-full">
 
     <div class="lg:col-span-1 space-y-6">
       
-      <div class="bg-white p-6 rounded-2xl shadow-lg shadow-slate-200/50 border border-slate-100">
+      <div class="bg-white p-4 sm:p-6 rounded-2xl shadow-lg shadow-slate-200/50 border border-slate-100">
         <div class="flex items-center gap-2 mb-4 border-b border-slate-100 pb-3">
           <span class="w-1.5 h-1.5 rounded-full bg-blue-500"></span>
           <h2 class="text-xs font-bold text-slate-500 uppercase tracking-wider">Datos del Plato</h2>
@@ -35,11 +35,11 @@
             <input 
               [(ngModel)]="nuevaReceta.nombre_receta" 
               type="text" 
-              class="w-full px-4 py-3 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none font-bold text-slate-800 text-lg placeholder-slate-300 shadow-sm"
+              class="w-full px-4 py-3 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none font-bold text-slate-800 text-base sm:text-lg placeholder-slate-300 shadow-sm"
               placeholder="Ej: Lomo Saltado">
           </div>
 
-          <div class="grid grid-cols-2 gap-4">
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
               <label class="block text-[11px] font-bold text-slate-500 uppercase mb-1.5 ml-1">Categoría</label>
               <div class="relative">
@@ -74,11 +74,10 @@
               <span class="absolute right-4 top-3.5 text-xs font-bold text-slate-400">g</span>
             </div>
           </div>
-
         </div>
       </div>
 
-      <div class="bg-white p-6 rounded-2xl shadow-lg shadow-slate-200/50 border border-slate-100">
+      <div class="bg-white p-4 sm:p-6 rounded-2xl shadow-lg shadow-slate-200/50 border border-slate-100">
         <div class="flex items-center gap-2 mb-4 border-b border-slate-100 pb-3">
           <span class="w-1.5 h-1.5 rounded-full bg-indigo-500"></span>
           <h2 class="text-xs font-bold text-slate-500 uppercase tracking-wider">Procedimiento</h2>
@@ -90,14 +89,14 @@
           placeholder="Describa el paso a paso de la preparación..."></textarea>
       </div>
 
-      <div class="bg-slate-900 text-white p-6 rounded-3xl shadow-2xl sticky top-6 overflow-hidden relative">
+      <div class="bg-slate-900 text-white p-5 sm:p-6 rounded-3xl shadow-2xl lg:sticky lg:top-24 overflow-hidden relative">
         <div class="absolute top-0 right-0 -mr-10 -mt-10 w-32 h-32 bg-amber-500 rounded-full opacity-10 blur-2xl"></div>
         <div class="absolute bottom-0 left-0 -ml-10 -mb-10 w-32 h-32 bg-blue-500 rounded-full opacity-10 blur-2xl"></div>
 
         <div class="mb-6 border-b border-slate-700/50 pb-6 relative z-10">
           <p class="text-slate-400 text-[10px] font-bold uppercase tracking-widest mb-2">Costo Total Producción</p>
-          <div class="text-4xl font-black text-white tracking-tight flex items-baseline gap-1">
-            <span class="text-2xl text-slate-500">$</span>
+          <div class="text-3xl sm:text-4xl font-black text-white tracking-tight flex items-baseline gap-1">
+            <span class="text-xl sm:text-2xl text-slate-500">$</span>
             {{ nuevaReceta.costo_receta | number:'1.2-2' }}
           </div>
         </div>
@@ -123,12 +122,12 @@
           </div>
         </div>
 
-        <div class="bg-emerald-500/10 p-5 rounded-2xl border border-emerald-500/30 mb-8 relative z-10 backdrop-blur-sm">
+        <div class="bg-emerald-500/10 p-4 sm:p-5 rounded-2xl border border-emerald-500/30 mb-8 relative z-10 backdrop-blur-sm">
           <p class="text-emerald-400 text-[10px] uppercase mb-1 font-bold tracking-widest">Precio Venta Sugerido</p>
-          <div class="text-3xl font-black text-emerald-400 tracking-tight">
+          <div class="text-2xl sm:text-3xl font-black text-emerald-400 tracking-tight">
             $ {{ nuevaReceta.precio_venta | number:'1.2-2' }}
           </div>
-          <div class="mt-3 pt-3 border-t border-emerald-500/20 flex justify-between items-center text-xs">
+          <div class="mt-3 pt-3 border-t border-emerald-500/20 flex flex-col sm:flex-row justify-between items-start sm:items-center text-xs gap-2">
             <span class="text-emerald-200/70">PVP por Porción:</span>
             <span class="font-bold text-white bg-emerald-500/20 px-2 py-0.5 rounded">
               $ {{ (nuevaReceta.precio_venta / (nuevaReceta.num_porciones || 1)) | number:'1.2-2' }}
@@ -139,7 +138,6 @@
         <button 
           (click)="guardarReceta()"
           class="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-bold py-4 px-6 rounded-xl transition shadow-lg shadow-blue-900/50 flex justify-center items-center gap-3 transform hover:-translate-y-0.5 active:translate-y-0 relative z-10">
-          <span></span> 
           <span>Guardar Ficha Técnica</span>
         </button>
       </div>
@@ -148,19 +146,19 @@
 
     <div class="lg:col-span-2 space-y-6">
       
-      <div class="bg-white p-6 rounded-2xl shadow-lg shadow-slate-200/50 border border-slate-100">
-        <div class="flex justify-between items-center mb-6">
+      <div class="bg-white p-4 sm:p-6 rounded-2xl shadow-lg shadow-slate-200/50 border border-slate-100">
+        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
           <div class="flex items-center gap-2">
             <span class="bg-amber-100 text-amber-600 p-1.5 rounded-lg text-lg">🥕</span>
             <h2 class="text-sm font-bold text-slate-700 uppercase tracking-wide">Mise en Place (Ingredientes)</h2>
           </div>
           
-          <button (click)="irACrearIngrediente()" class="text-xs font-bold text-blue-600 bg-blue-50 hover:bg-blue-100 px-4 py-2 rounded-lg transition border border-blue-100">
+          <button (click)="irACrearIngrediente()" class="w-full sm:w-auto text-xs font-bold text-blue-600 bg-blue-50 hover:bg-blue-100 px-4 py-2 rounded-lg transition border border-blue-100">
             + Nuevo Ingrediente Base
           </button>
         </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-12 gap-4 items-end bg-slate-50 p-5 rounded-xl border border-slate-100">
+        <div class="grid grid-cols-1 md:grid-cols-12 gap-4 items-end bg-slate-50 p-4 sm:p-5 rounded-xl border border-slate-100">
           
           <div class="md:col-span-5">
             <label class="block text-[11px] font-bold text-slate-500 uppercase mb-1.5 ml-1">Buscar Ingrediente</label>
@@ -181,19 +179,21 @@
             </datalist>
           </div>
 
-          <div class="md:col-span-2">
-            <label class="block text-[11px] font-bold text-slate-500 uppercase mb-1.5 ml-1">Cantidad</label>
-            <input 
-              [(ngModel)]="cantidadAgregar" 
-              type="number" 
-              placeholder="0"
-              class="w-full h-11 border border-slate-200 rounded-lg text-center font-bold text-slate-800 focus:ring-2 focus:ring-blue-500 outline-none">
-          </div>
+          <div class="grid grid-cols-2 md:contents gap-4">
+            <div class="md:col-span-2">
+              <label class="block text-[11px] font-bold text-slate-500 uppercase mb-1.5 ml-1">Cantidad</label>
+              <input 
+                [(ngModel)]="cantidadAgregar" 
+                type="number" 
+                placeholder="0"
+                class="w-full h-11 border border-slate-200 rounded-lg text-center font-bold text-slate-800 focus:ring-2 focus:ring-blue-500 outline-none">
+            </div>
 
-          <div class="md:col-span-2">
-            <label class="block text-[11px] font-bold text-slate-500 uppercase mb-1.5 ml-1">Unidad</label>
-            <div class="w-full h-11 flex items-center justify-center bg-slate-200 text-slate-600 rounded-lg border border-slate-300 font-bold text-xs uppercase tracking-wide">
-              {{ unidadSeleccionada || '-' }}
+            <div class="md:col-span-2">
+              <label class="block text-[11px] font-bold text-slate-500 uppercase mb-1.5 ml-1">Unidad</label>
+              <div class="w-full h-11 flex items-center justify-center bg-slate-200 text-slate-600 rounded-lg border border-slate-300 font-bold text-xs uppercase tracking-wide">
+                {{ unidadSeleccionada || '-' }}
+              </div>
             </div>
           </div>
 
@@ -206,17 +206,17 @@
           </div>
         </div>
 
-        <div *ngIf="ingredienteSeleccionadoId" class="mt-4 flex items-center justify-between bg-blue-50/50 border border-blue-100 p-4 rounded-xl animate-fade-in">
+        <div *ngIf="ingredienteSeleccionadoId" class="mt-4 flex flex-col sm:flex-row items-start sm:items-center justify-between bg-blue-50/50 border border-blue-100 p-4 rounded-xl animate-fade-in gap-4">
           <div class="flex items-center gap-3">
-            <div class="h-10 w-10 bg-white rounded-full flex items-center justify-center text-xl shadow-sm border border-blue-100">🧪</div>
+            <div class="h-10 w-10 bg-white rounded-full flex items-center justify-center text-xl shadow-sm border border-blue-100 shrink-0">🧪</div>
             <div>
               <p class="text-[10px] text-blue-800 font-bold uppercase tracking-wide">Costo Real (Con Merma)</p>
               <p class="text-sm text-blue-600 font-medium">
-                El sistema usará: <strong class="text-blue-800">$ {{ costoRealUnitario | number:'1.2-2' }}</strong> por {{ unidadSeleccionada }}
+                Uso: <strong class="text-blue-800">$ {{ costoRealUnitario | number:'1.2-2' }}</strong> por {{ unidadSeleccionada }}
               </p>
             </div>
           </div>
-          <div class="text-right">
+          <div class="w-full sm:w-auto text-left sm:text-right border-t sm:border-t-0 pt-2 sm:pt-0">
             <p class="text-[10px] text-slate-400 font-bold uppercase">Subtotal Estimado</p>
             <p class="text-xl font-black text-blue-700 tracking-tight">
               $ {{ (cantidadAgregar * costoRealUnitario) | number:'1.2-2' }}
@@ -230,38 +230,38 @@
           <h3 class="font-bold text-slate-700 uppercase text-xs tracking-wide">Ingredientes en la preparación</h3>
         </div>
 
-        <div class="overflow-x-auto">
-          <table class="w-full text-left border-collapse">
+        <div class="overflow-x-auto w-full">
+          <table class="min-w-[600px] w-full text-left border-collapse">
             <thead class="bg-white text-slate-400 text-[10px] uppercase font-bold tracking-wider border-b border-slate-100">
               <tr>
-                <th class="p-5">Ingrediente</th>
-                <th class="p-5 text-center">Cant.</th>
-                <th class="p-5 text-center">Unidad</th>
-                <th class="p-5 text-right">Costo Real/U</th>
-                <th class="p-5 text-right">Subtotal</th>
-                <th class="p-5 text-center">Acción</th>
+                <th class="p-4 sm:p-5">Ingrediente</th>
+                <th class="p-4 sm:p-5 text-center">Cant.</th>
+                <th class="p-4 sm:p-5 text-center">Unidad</th>
+                <th class="p-4 sm:p-5 text-right">Costo Real/U</th>
+                <th class="p-4 sm:p-5 text-right">Subtotal</th>
+                <th class="p-4 sm:p-5 text-center">Acción</th>
               </tr>
             </thead>
             <tbody class="text-sm text-slate-700 divide-y divide-slate-100">
               <tr *ngFor="let item of nuevaReceta.recetasIngredientes; let i = index" class="hover:bg-slate-50 transition duration-150 group">
-                <td class="p-5 font-bold text-slate-800">{{ item.nombre }}</td>
-                <td class="p-5 text-center font-bold bg-slate-50/50">{{ item.cantidad_usada }}</td>
-                <td class="p-5 text-center text-slate-500 text-xs uppercase">{{ item.unidad }}</td>
+                <td class="p-4 sm:p-5 font-bold text-slate-800">{{ item.nombre }}</td>
+                <td class="p-4 sm:p-5 text-center font-bold bg-slate-50/50">{{ item.cantidad_usada }}</td>
+                <td class="p-4 sm:p-5 text-center text-slate-500 text-xs uppercase">{{ item.unidad }}</td>
                 
-                <td class="p-5 text-right text-slate-500 font-mono text-xs">
+                <td class="p-4 sm:p-5 text-right text-slate-500 font-mono text-xs">
                   $ {{ item.precio | number:'1.2-2' }}
                 </td>
 
-                <td class="p-5 text-right">
+                <td class="p-4 sm:p-5 text-right">
                   <span class="font-bold text-emerald-600 bg-emerald-50 px-2 py-1 rounded border border-emerald-100">
                     $ {{ item.subtotal | number:'1.2-2' }}
                   </span>
                 </td>
 
-                <td class="p-5 text-center">
+                <td class="p-4 sm:p-5 text-center">
                   <button 
                     (click)="eliminarIngrediente(i)"
-                    class="text-slate-300 hover:text-rose-500 hover:bg-rose-50 p-2 rounded-lg transition opacity-0 group-hover:opacity-100"
+                    class="text-slate-300 hover:text-rose-500 hover:bg-rose-50 p-2 rounded-lg transition opacity-100 lg:opacity-0 lg:group-hover:opacity-100"
                     title="Eliminar ingrediente">
                     🗑
                   </button>

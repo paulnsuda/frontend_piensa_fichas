@@ -1,55 +1,59 @@
-<nav class="bg-white shadow-md w-full mb-6">
+<nav class="bg-white shadow-md w-full mb-6 sticky top-0 z-50">
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-    <div class="flex flex-col md:flex-row justify-between items-center py-4">
+    <div class="flex justify-between items-center h-16">
       
-      <div class="mb-4 md:mb-0">
-        <div class="text-2xl font-bold text-gray-800 flex items-center gap-2">
-          <span>🍽️</span>
-          <span>Gestor Gastronómico</span>
-        </div>
+      <div class="flex-shrink-0 flex items-center gap-2 cursor-pointer" routerLink="/home">
+        <span class="text-2xl">🍽️</span>
+        <span class="text-xl font-bold text-gray-800 hidden sm:block">Gestor Gastronómico</span>
+        <span class="text-xl font-bold text-gray-800 sm:hidden">GG</span>
       </div>
 
-      <div class="flex flex-wrap justify-center gap-4 items-center">
-        <a routerLink="/home" 
-           routerLinkActive="text-blue-600 bg-blue-50" 
-           class="px-3 py-2 rounded-md text-sm font-medium text-gray-600 hover:text-blue-600 hover:bg-gray-50 transition">
-           Inicio
-        </a>
-        <a routerLink="/ingredientes" 
-           routerLinkActive="text-blue-600 bg-blue-50" 
-           class="px-3 py-2 rounded-md text-sm font-medium text-gray-600 hover:text-blue-600 hover:bg-gray-50 transition">
-           Ingredientes
-        </a>
-        <a routerLink="/listar-recetas" 
-           routerLinkActive="text-blue-600 bg-blue-50" 
-           class="px-3 py-2 rounded-md text-sm font-medium text-gray-600 hover:text-blue-600 hover:bg-gray-50 transition">
-           Fichas
-        </a>
-        <a routerLink="/compras" 
-           routerLinkActive="text-blue-600 bg-blue-50" 
-           class="px-3 py-2 rounded-md text-sm font-medium text-gray-600 hover:text-blue-600 hover:bg-gray-50 transition">
-           Compras
-        </a>
-        <a routerLink="/proveedores" 
-           routerLinkActive="text-blue-600 bg-blue-50" 
-           class="px-3 py-2 rounded-md text-sm font-medium text-gray-600 hover:text-blue-600 hover:bg-gray-50 transition">
-           Proveedores
-        </a>
-      </div>
-
-      <div class="mt-4 md:mt-0 flex items-center gap-3">
-        <span *ngIf="rol" class="text-xs font-bold text-white bg-blue-500 px-2 py-1 rounded uppercase">
-          {{ rol }}
-        </span>
-        <button (click)="logout()" class="text-sm bg-red-100 text-red-600 hover:bg-red-200 px-4 py-2 rounded-md font-medium transition">
-          Cerrar sesión
+      <div class="flex md:hidden">
+        <button (click)="menuAbierto = !menuAbierto" class="text-gray-600 hover:text-blue-600 focus:outline-none p-2">
+          <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path *ngIf="!menuAbierto" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+            <path *ngIf="menuAbierto" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+          </svg>
         </button>
       </div>
 
+      <div class="hidden md:flex flex-1 justify-center gap-2 items-center">
+        <a routerLink="/home" routerLinkActive="text-blue-600 bg-blue-50" class="px-3 py-2 rounded-md text-sm font-medium text-gray-600 hover:text-blue-600 hover:bg-gray-50 transition">Inicio</a>
+        <a routerLink="/ingredientes" routerLinkActive="text-blue-600 bg-blue-50" class="px-3 py-2 rounded-md text-sm font-medium text-gray-600 hover:text-blue-600 hover:bg-gray-50 transition">Ingredientes</a>
+        <a routerLink="/listar-recetas" routerLinkActive="text-blue-600 bg-blue-50" class="px-3 py-2 rounded-md text-sm font-medium text-gray-600 hover:text-blue-600 hover:bg-gray-50 transition">Fichas</a>
+        <a routerLink="/compras" routerLinkActive="text-blue-600 bg-blue-50" class="px-3 py-2 rounded-md text-sm font-medium text-gray-600 hover:text-blue-600 hover:bg-gray-50 transition">Compras</a>
+        <a routerLink="/proveedores" routerLinkActive="text-blue-600 bg-blue-50" class="px-3 py-2 rounded-md text-sm font-medium text-gray-600 hover:text-blue-600 hover:bg-gray-50 transition">Proveedores</a>
+      </div>
+
+      <div class="hidden md:flex items-center gap-3">
+        <span *ngIf="rol" class="text-[10px] font-bold text-white bg-blue-500 px-2 py-1 rounded uppercase tracking-wider">
+          {{ rol }}
+        </span>
+        <button (click)="logout()" class="text-sm bg-red-100 text-red-600 hover:bg-red-200 px-4 py-2 rounded-md font-medium transition">
+          Salir
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div class="md:hidden bg-white border-t border-gray-100" [class.hidden]="!menuAbierto">
+    <div class="px-2 pt-2 pb-3 space-y-1">
+      <a routerLink="/home" (click)="menuAbierto = false" routerLinkActive="bg-blue-50 text-blue-600" class="block px-3 py-2 rounded-md text-base font-medium text-gray-600">Inicio</a>
+      <a routerLink="/ingredientes" (click)="menuAbierto = false" routerLinkActive="bg-blue-50 text-blue-600" class="block px-3 py-2 rounded-md text-base font-medium text-gray-600">Ingredientes</a>
+      <a routerLink="/listar-recetas" (click)="menuAbierto = false" routerLinkActive="bg-blue-50 text-blue-600" class="block px-3 py-2 rounded-md text-base font-medium text-gray-600">Fichas</a>
+      <a routerLink="/compras" (click)="menuAbierto = false" routerLinkActive="bg-blue-50 text-blue-600" class="block px-3 py-2 rounded-md text-base font-medium text-gray-600">Compras</a>
+      <a routerLink="/proveedores" (click)="menuAbierto = false" routerLinkActive="bg-blue-50 text-blue-600" class="block px-3 py-2 rounded-md text-base font-medium text-gray-600">Proveedores</a>
+      
+      <div class="pt-4 pb-2 border-t border-gray-100">
+        <div class="flex items-center px-3 gap-3">
+          <span class="text-xs font-bold text-white bg-blue-500 px-2 py-1 rounded uppercase">{{ rol }}</span>
+          <button (click)="logout()" class="w-full text-left text-sm text-red-600 font-bold py-2">Cerrar sesión</button>
+        </div>
+      </div>
     </div>
   </div>
 </nav>
 
-<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-10">
+<main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-10">
   <router-outlet></router-outlet>
-</div>
+</main>
