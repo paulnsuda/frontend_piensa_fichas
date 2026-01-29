@@ -2,6 +2,7 @@ import { Routes, Router } from '@angular/router';
 import { inject } from '@angular/core';
 import { AuthService } from './guards/auth.service';
 
+// Guard funcional para proteger rutas
 export const authGuard = () => {
   const auth = inject(AuthService);
   const router = inject(Router);
@@ -32,6 +33,11 @@ export const routes: Routes = [
     canActivate: [authGuard],
     children: [
       {
+        path: '',
+        redirectTo: 'home',
+        pathMatch: 'full'
+      },
+      {
         path: 'home',
         loadComponent: () => import('./pages/home/home.component').then(m => m.HomeComponent),
         title: 'Inicio'
@@ -41,30 +47,21 @@ export const routes: Routes = [
         loadComponent: () => import('./pages/ingredientes/ingredientes.component').then(m => m.IngredientesComponent),
         title: 'Ingredientes'
       },
-      
-      // 1. Crear Receta (Formulario Nuevo)
       {
         path: 'recetas',
         loadComponent: () => import('./pages/recetas/recetas.component').then(m => m.RecetasComponent),
         title: 'Crear Receta'
       },
-
-      // 👇 2. EDITAR RECETA (Ruta Nueva)
-      // Reutilizamos el mismo componente RecetasComponent
       {
         path: 'recetas/editar/:id',
         loadComponent: () => import('./pages/recetas/recetas.component').then(m => m.RecetasComponent),
         title: 'Editar Receta'
       },
-
-      // 3. VER FICHA TÉCNICA
       {
-        path: 'ver-ficha/:id', // Nota: Tu código anterior decía 'recetas/:id', pero en ver-ficha.component.ts usas routerLink a 'ver-ficha'. Lo he estandarizado a 'ver-ficha' para evitar conflictos.
+        path: 'ver-ficha/:id',
         loadComponent: () => import('./pages/ver-ficha/ver-ficha.component').then(m => m.VerFichaComponent),
-        title: 'Ficha Técnica de Alta Cocina'
+        title: 'Ficha Técnica'
       },
-      
-      // 4. Listar Recetas (El Menú)
       {
         path: 'listar-recetas',
         loadComponent: () => import('./pages/listar/listar-recetas.component').then(m => m.ListarRecetasComponent),
@@ -83,8 +80,6 @@ export const routes: Routes = [
     ]
   },
 
-  // ======================================
-  // REDIRECCIÓN POR DEFECTO
-  // ======================================
+  // Redirección para rutas inexistentes
   { path: '**', redirectTo: 'login' }
 ];

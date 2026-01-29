@@ -3,8 +3,11 @@
   "framework": "angular",
   "buildCommand": "npm run build -- --configuration production",
   "outputDirectory": "dist/fichas-app/browser",
+  "cleanUrls": true,
   "rewrites": [
-    { "source": "/(.*)", "destination": "/index.html" }
-  ],
-  "cleanUrls": true
+    {
+      "source": "/(.*)",
+      "destination": "/index.html"
+    }
+  ]
 }
