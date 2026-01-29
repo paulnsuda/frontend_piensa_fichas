@@ -1,12 +1,12 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Router }      from '@angular/router';
+import { Router } from '@angular/router';
 import { tap, Observable } from 'rxjs';
-import { environment }     from '../../environments/environment';
+import { environment } from '../../environments/environment'; // 👈 Asegúrate de que esta ruta sea correcta
 
 export interface LoginResponse {
   access_token: string;
-  user:        any;
+  user: any;
 }
 
 @Injectable({ providedIn: 'root' })
@@ -14,29 +14,28 @@ export class AuthService {
 
   private readonly TOKEN_KEY = 'token';
   
-  // 🔴 CORRECCIÓN AQUÍ:
-  // Forzamos la dirección local para desarrollo.
-  // Cuando subas a producción, descomenta la segunda línea y comenta la primera.
-  private readonly BASE = 'http://localhost:3000'; 
-  // private readonly BASE = environment.apiUrl; 
+  // ✅ CORRECCIÓN APLICADA:
+  // Usamos environment.apiUrl.
+  // - En local leerá 'http://localhost:3000' (desde environment.ts)
+  // - En Vercel leerá 'https://...railway.app' (desde environment.prod.ts)
+  private readonly BASE = environment.apiUrl; 
 
   /* ---------------- ctor ---------------- */
   constructor(private http: HttpClient,
-              private router: Router) {}
+              private router: Router) {
+      // 👇 Este log te servirá para confirmar en la consola del navegador a dónde se está conectando
+      console.log('🔌 AuthService conectando a:', this.BASE);
+  }
 
   /* --------------- end-points --------------- */
   
-  // Como tu controller tiene @Controller('auth'), la ruta base es /auth
-  
   login(dto: { email: string; password: string }): Observable<LoginResponse> {
-    // Esto generará: http://localhost:3000/auth/login
     return this.http
       .post<LoginResponse>(`${this.BASE}/auth/login`, dto)
       .pipe(tap(res => this.saveToken(res.access_token)));
   }
 
   register(dto: any) {
-    // Esto generará: http://localhost:3000/auth/register
     return this.http.post(`${this.BASE}/auth/register`, dto);
   }
 
@@ -66,7 +65,6 @@ export class AuthService {
 
     try {
       const payload = JSON.parse(atob(t.split('.')[1]));
-      // Soporte para ambos nombres de campo por si acaso
       return payload.role ?? payload.rol ?? null;
     } catch { return null; }
   }
