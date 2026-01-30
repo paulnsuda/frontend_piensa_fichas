@@ -2,7 +2,11 @@ import { Routes, Router } from '@angular/router';
 import { inject } from '@angular/core';
 import { AuthService } from './guards/auth.service';
 
-// Guard funcional para proteger rutas
+/**
+ * Guard funcional para proteger las rutas.
+ * Si el usuario está logueado, permite el acceso.
+ * Si no, redirige a la página de inicio de sesión.
+ */
 export const authGuard = () => {
   const auth = inject(AuthService);
   const router = inject(Router);
@@ -80,6 +84,13 @@ export const routes: Routes = [
     ]
   },
 
-  // Redirección para rutas inexistentes
-  { path: '**', redirectTo: 'login' }
+  // ======================================
+  // MANEJO DE RUTAS NO ENCONTRADAS / REFRESH
+  // ======================================
+  /**
+   * Esta línea es fundamental: al usar el comodín '**', cualquier ruta que no coincida
+   * con las anteriores (especialmente útil tras un refresco de página en producción)
+   * redirigirá al usuario al Home.
+   */
+  { path: '**', redirectTo: 'home' }
 ];
