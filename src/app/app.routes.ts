@@ -4,12 +4,12 @@ import { AuthService } from './guards/auth.service';
 
 /**
  * Guard funcional para proteger las rutas.
- * Si el usuario está logueado, permite el acceso.
- * Si no, redirige a la página de inicio de sesión.
+ * Verifica si el usuario tiene un token válido antes de permitir el acceso.
  */
 export const authGuard = () => {
   const auth = inject(AuthService);
   const router = inject(Router);
+  // Si está logueado permite el paso, de lo contrario redirige a login.
   return auth.isLoggedIn() ? true : router.parseUrl('/login');
 };
 
@@ -34,7 +34,7 @@ export const routes: Routes = [
   {
     path: '',
     loadComponent: () => import('./layout/layout.component').then(m => m.LayoutComponent),
-    canActivate: [authGuard],
+    canActivate: [authGuard], // Protege todas las rutas hijas.
     children: [
       {
         path: '',
@@ -88,9 +88,8 @@ export const routes: Routes = [
   // MANEJO DE RUTAS NO ENCONTRADAS / REFRESH
   // ======================================
   /**
-   * Esta línea es fundamental: al usar el comodín '**', cualquier ruta que no coincida
-   * con las anteriores (especialmente útil tras un refresco de página en producción)
-   * redirigirá al usuario al Home.
+   * Captura cualquier ruta no definida (comodín '**').
+   * Al refrescar la página en producción, redirige automáticamente al Home.
    */
   { path: '**', redirectTo: 'home' }
 ];
